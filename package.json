@@ -1,0 +1,9 @@
+{
+  "name": "jmfix-portal",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Portal de seguimiento de órdenes de reparación para JM Fix",
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
+  }
+}

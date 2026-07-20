@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>JM Fix — Seguimiento de tu reparación</title>
+<meta name="description" content="Consultá el estado de tu reparación en JM Fix con tu número de orden." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{
+    --bg: #14171c;
+    --surface: #1b1f26;
+    --surface-2: #22272f;
+    --line: #333a45;
+    --amber: #ffb020;
+    --teal: #4dd6c4;
+    --text: #f2f0ea;
+    --muted: #9aa2ad;
+    --danger: #ff6b6b;
+    --radius: 14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 15% -10%, rgba(255,176,32,.08), transparent 60%),
+      radial-gradient(1000px 500px at 100% 10%, rgba(77,214,196,.07), transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:"IBM Plex Sans", system-ui, sans-serif;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+  .mono{ font-family:"JetBrains Mono", ui-monospace, monospace; }
+
+  header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:24px clamp(20px,5vw,64px);
+    border-bottom:1px solid var(--line);
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:"JetBrains Mono", monospace;
+    font-weight:800;
+    letter-spacing:.02em;
+    font-size:19px;
+  }
+  .brand .dot{
+    width:10px;height:10px;border-radius:50%;
+    background:var(--amber);
+    box-shadow:0 0 12px rgba(255,176,32,.7);
+  }
+  .brand small{
+    display:block;
+    font-family:"IBM Plex Sans", sans-serif;
+    font-weight:400;
+    color:var(--muted);
+    font-size:11px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+
+  main{
+    flex:1;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:clamp(28px,6vw,64px) 20px 60px;
+  }
+
+  .wrap{ width:100%; max-width:560px; }
+
+  .eyebrow{
+    color:var(--teal);
+    font-family:"JetBrains Mono", monospace;
+    font-size:12.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    margin:0 0 10px;
+  }
+  h1{
+    font-size:clamp(26px,4vw,34px);
+    line-height:1.15;
+    margin:0 0 12px;
+    letter-spacing:-0.01em;
+  }
+  .lead{
+    color:var(--muted);
+    margin:0 0 32px;
+    font-size:15.5px;
+    line-height:1.55;
+  }
+
+  /* --- Ticket / claim stub --- */
+  .ticket{
+    position:relative;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:visible;
+  }
+  .ticket-notch{
+    position:absolute; top:calc(var(--notch-y, 0px)); width:22px; height:22px;
+    background:var(--bg); border-radius:50%;
+  }
+  .stub{
+    padding:22px clamp(20px,4vw,32px);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+  }
+  .stub-label{
+    font-family:"JetBrains Mono", monospace;
+    font-size:11.5px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin:0 0 6px;
+  }
+  form{ display:flex; flex-direction:column; gap:6px; flex:1; }
+  .input-row{
+    display:flex;
+    gap:10px;
+  }
+  input[type="text"]{
+    flex:1;
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    color:var(--text);
+    font-family:"JetBrains Mono", monospace;
+    font-size:18px;
+    font-weight:600;
+    letter-spacing:.03em;
+    padding:14px 16px;
+    border-radius:10px;
+    outline:none;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  input[type="text"]::placeholder{ color:#5b6270; font-weight:400; }
+  input[type="text"]:focus{
+    border-color:var(--amber);
+    box-shadow:0 0 0 3px rgba(255,176,32,.15);
+  }
+  button{
+    font-family:"IBM Plex Sans", sans-serif;
+    font-weight:700;
+    font-size:15px;
+    border:none;
+    border-radius:10px;
+    padding:14px 22px;
+    cursor:pointer;
+    background:var(--amber);
+    color:#171308;
+    transition:transform .1s ease, filter .15s ease;
+    white-space:nowrap;
+  }
+  button:hover{ filter:brightness(1.06); }
+  button:active{ transform:translateY(1px); }
+  button:disabled{ opacity:.55; cursor:default; }
+  button:focus-visible, a:focus-visible, input:focus-visible{
+    outline:2px solid var(--teal); outline-offset:2px;
+  }
+
+  .perforation{
+    border:none;
+    border-top:2px dashed var(--line);
+    margin:0;
+  }
+
+  .msg{
+    padding:14px clamp(20px,4vw,32px);
+    font-size:14px;
+    display:none;
+  }
+  .msg.show{ display:block; }
+  .msg.error{ color:var(--danger); }
+  .msg.info{ color:var(--muted); }
+
+  .result{
+    display:none;
+    padding:26px clamp(20px,4vw,32px) 30px;
+  }
+  .result.show{ display:block; animation:reveal .35s ease; }
+  @keyframes reveal{
+    from{ opacity:0; transform:translateY(-6px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+  .result-top{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin-bottom:18px;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .order-number{
+    font-family:"JetBrains Mono", monospace;
+    font-size:22px;
+    font-weight:700;
+  }
+  .order-number span{ color:var(--muted); font-size:13px; font-weight:400; }
+
+  .status-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:6px 13px;
+    border-radius:999px;
+    font-size:12.5px;
+    font-weight:600;
+    font-family:"JetBrains Mono", monospace;
+    letter-spacing:.02em;
+    border:1px solid;
+  }
+  .status-pill .dot{ width:7px; height:7px; border-radius:50%; }
+
+  .grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin-bottom:18px;
+  }
+  .field{
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:12px 14px;
+  }
+  .field.full{ grid-column:1 / -1; }
+  .field-label{
+    font-family:"JetBrains Mono", monospace;
+    font-size:10.5px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin:0 0 5px;
+  }
+  .field-value{ font-size:14.5px; line-height:1.5; }
+  .field-value.mono{ font-size:15px; }
+  .field-value.amount{ font-family:"JetBrains Mono", monospace; font-weight:700; font-size:17px; }
+  .field-value.saldo-ok{ color:var(--teal); }
+  .field-value.saldo-pend{ color:var(--amber); }
+
+  .pdf-btn{
+    width:100%;
+    background:var(--teal);
+    color:#0d1f1c;
+    margin-top:4px;
+  }
+
+  footer{
+    text-align:center;
+    color:var(--muted);
+    font-size:12.5px;
+    padding:22px;
+  }
+  footer a{ color:var(--muted); }
+
+  @media (max-width:480px){
+    .grid{ grid-template-columns:1fr; }
+    .input-row{ flex-direction:column; }
+    button{ width:100%; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand"><span class="dot"></span>JM<span style="color:var(--amber)">FIX</span></div>
+  <small class="mono" style="color:var(--muted); font-size:11px; letter-spacing:.1em;">SEGUIMIENTO&nbsp;DE&nbsp;ÓRDENES</small>
+</header>
+
+<main>
+  <div class="wrap">
+    <p class="eyebrow">Estado de tu equipo</p>
+    <h1>Ingresá tu número de orden</h1>
+    <p class="lead">Es el número que te dimos cuando dejaste tu equipo. Vas a ver el estado, el presupuesto y cuánto te falta abonar, y podés descargarlo en PDF.</p>
+
+    <section class="ticket" id="ticket">
+      <div class="stub">
+        <form id="lookup-form">
+          <p class="stub-label">N.º de orden</p>
+          <div class="input-row">
+            <input type="text" id="numero" name="numero" inputmode="numeric" autocomplete="off" placeholder="Ej: 1042" required />
+            <button type="submit" id="submit-btn">Consultar</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="msg error" id="error-msg"></div>
+      <div class="msg info" id="loading-msg">Buscando tu orden…</div>
+
+      <hr class="perforation" id="perforation" style="display:none" />
+
+      <div class="result" id="result"></div>
+    </section>
+
+    <footer>¿No encontrás tu número o tenés una duda? Escribinos y te ayudamos.</footer>
+  </div>
+</main>
+
+<script>
+const ESTADOS = {
+  ingresado:        { label: "Ingresado",                         color: "#9aa2ad" },
+  diagnosticando:   { label: "En diagnóstico",                    color: "#4dd6c4" },
+  presupuestado:    { label: "Presupuestado — esperando OK",      color: "#ffb020" },
+  en_reparacion:    { label: "En reparación",                     color: "#ffb020" },
+  esperando_repuesto:{ label: "Esperando repuesto",               color: "#ffb020" },
+  listo:            { label: "Listo para retirar",                color: "#4dd6c4" },
+  entregado:        { label: "Entregado",                         color: "#7fd858" },
+  no_reparable:     { label: "No reparable",                      color: "#ff6b6b" },
+};
+
+const form = document.getElementById("lookup-form");
+const errorMsg = document.getElementById("error-msg");
+const loadingMsg = document.getElementById("loading-msg");
+const result = document.getElementById("result");
+const perforation = document.getElementById("perforation");
+const submitBtn = document.getElementById("submit-btn");
+
+function money(n){
+  const num = Number(n) || 0;
+  return num.toLocaleString("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 });
+}
+
+function fmtDate(d){
+  if(!d) return "—";
+  const parts = String(d).split("-");
+  if(parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  return d;
+}
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const numero = document.getElementById("numero").value.trim();
+  if(!numero) return;
+
+  errorMsg.classList.remove("show");
+  result.classList.remove("show");
+  perforation.style.display = "none";
+  loadingMsg.classList.add("show");
+  submitBtn.disabled = true;
+
+  try{
+    const res = await fetch(`/api/orders?numero=${encodeURIComponent(numero)}`);
+    const data = await res.json();
+    loadingMsg.classList.remove("show");
+    submitBtn.disabled = false;
+
+    if(!res.ok){
+      errorMsg.textContent = data.error || "No pudimos encontrar esa orden.";
+      errorMsg.classList.add("show");
+      return;
+    }
+
+    renderResult(data);
+    perforation.style.display = "block";
+    result.classList.add("show");
+    generatePdf(data, { autoDownload: true });
+  }catch(err){
+    loadingMsg.classList.remove("show");
+    submitBtn.disabled = false;
+    errorMsg.textContent = "Hubo un problema de conexión. Probá de nuevo en un momento.";
+    errorMsg.classList.add("show");
+  }
+});
+
+function renderResult(o){
+  const estado = ESTADOS[o.estado] || { label: o.estado || "—", color: "#9aa2ad" };
+  const saldo = Number(o.saldo);
+  const saldoClass = saldo > 0 ? "saldo-pend" : "saldo-ok";
+  const saldoText = saldo > 0 ? money(saldo) : "Sin saldo pendiente";
+
+  result.innerHTML = `
+    <div class="result-top">
+      <div class="order-number">N.º ${o.numero} <span>· ingresado ${fmtDate(o.fechaIngreso)}</span></div>
+      <span class="status-pill" style="border-color:${estado.color}55; color:${estado.color};">
+        <span class="dot" style="background:${estado.color}"></span>${estado.label}
+      </span>
+    </div>
+
+    <div class="grid">
+      ${o.dispositivo ? `<div class="field full"><p class="field-label">Equipo</p><p class="field-value">${o.dispositivo}</p></div>` : ""}
+      <div class="field full">
+        <p class="field-label">Diagnóstico</p>
+        <p class="field-value">${o.detalleDiagnostico || "Todavía no cargamos el diagnóstico."}</p>
+      </div>
+      <div class="field">
+        <p class="field-label">Presupuesto</p>
+        <p class="field-value amount">${o.presupuesto != null ? money(o.presupuesto) : "—"}</p>
+      </div>
+      <div class="field">
+        <p class="field-label">Garantía</p>
+        <p class="field-value mono">${o.garantia || "—"}</p>
+      </div>
+      <div class="field">
+        <p class="field-label">Total</p>
+        <p class="field-value amount">${o.total != null ? money(o.total) : "—"}</p>
+      </div>
+      <div class="field">
+        <p class="field-label">Saldo pendiente</p>
+        <p class="field-value amount ${saldoClass}">${saldoText}</p>
+      </div>
+    </div>
+
+    <button class="pdf-btn" id="pdf-btn" type="button">Descargar detalle en PDF</button>
+  `;
+
+  document.getElementById("pdf-btn").addEventListener("click", () => generatePdf(o, { autoDownload: true }));
+}
+
+function generatePdf(o, opts){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const estado = ESTADOS[o.estado] || { label: o.estado || "—" };
+  const saldo = Number(o.saldo);
+
+  doc.setFillColor(20, 23, 28);
+  doc.rect(0, 0, 210, 30, "F");
+  doc.setTextColor(255, 176, 32);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(20);
+  doc.text("JM FIX", 15, 19);
+  doc.setTextColor(230, 230, 230);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.text("Detalle de orden de reparación", 15, 25);
+
+  doc.setTextColor(20, 23, 28);
+  let y = 44;
+  const line = (label, value) => {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.text(label, 15, y);
+    doc.setFont("helvetica", "normal");
+    doc.text(String(value != null && value !== "" ? value : "—"), 70, y);
+    y += 9;
+  };
+
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "bold");
+  doc.text(`Orden N.º ${o.numero}`, 15, y);
+  y += 10;
+
+  line("Fecha de ingreso:", fmtDate(o.fechaIngreso));
+  if(o.cliente) line("Cliente:", o.cliente);
+  if(o.dispositivo) line("Equipo:", o.dispositivo);
+  line("Estado:", estado.label);
+  y += 2;
+  doc.setFont("helvetica", "bold");
+  doc.text("Detalle del diagnóstico:", 15, y);
+  y += 7;
+  doc.setFont("helvetica", "normal");
+  const diag = doc.splitTextToSize(o.detalleDiagnostico || "Sin diagnóstico cargado.", 180);
+  doc.text(diag, 15, y);
+  y += diag.length * 6 + 6;
+
+  line("Presupuesto:", o.presupuesto != null ? money(o.presupuesto) : "—");
+  line("Garantía:", o.garantia || "—");
+  line("Total:", o.total != null ? money(o.total) : "—");
+  line("Pagado:", o.pagado != null ? money(o.pagado) : "—");
+
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(saldo > 0 ? 200 : 20, saldo > 0 ? 100 : 130, saldo > 0 ? 20 : 90);
+  doc.text(`Saldo pendiente: ${saldo > 0 ? money(saldo) : "Sin saldo pendiente"}`, 15, y);
+
+  y += 16;
+  doc.setDrawColor(200);
+  doc.line(15, y, 195, y);
+  y += 8;
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.setTextColor(120);
+  doc.text("Este comprobante es informativo. Ante cualquier duda, contactanos por WhatsApp o Instagram.", 15, y);
+
+  if(opts && opts.autoDownload){
+    doc.save(`Orden-${o.numero}.pdf`);
+  }
+  return doc;
+}
+</script>
+</body>
+</html>

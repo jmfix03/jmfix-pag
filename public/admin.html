@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow, noarchive" />
+<title>Panel admin — JM Fix</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#14171c; --surface:#1b1f26; --surface-2:#22272f; --line:#333a45;
+    --amber:#ffb020; --teal:#4dd6c4; --text:#f2f0ea; --muted:#9aa2ad; --danger:#ff6b6b;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--bg); color:var(--text); font-family:"IBM Plex Sans",system-ui,sans-serif; min-height:100vh; }
+  .mono{ font-family:"JetBrains Mono", monospace; }
+
+  header{ display:flex; align-items:center; justify-content:space-between; padding:18px clamp(16px,4vw,40px); border-bottom:1px solid var(--line); }
+  .brand{ font-family:"JetBrains Mono",monospace; font-weight:800; font-size:17px; }
+  .brand span{ color:var(--amber); }
+  #logout-btn{ display:none; }
+
+  main{ padding:clamp(16px,4vw,40px); max-width:1000px; margin:0 auto; }
+
+  /* Login */
+  #login-view{ max-width:360px; margin:60px auto 0; }
+  #login-view h1{ font-size:20px; margin-bottom:6px; }
+  #login-view p{ color:var(--muted); font-size:14px; margin-top:0; margin-bottom:20px; }
+  input, select, textarea{
+    width:100%; background:var(--surface-2); border:1px solid var(--line); color:var(--text);
+    padding:11px 13px; border-radius:8px; font-family:inherit; font-size:14.5px; outline:none;
+  }
+  textarea{ resize:vertical; min-height:70px; }
+  input:focus, select:focus, textarea:focus{ border-color:var(--amber); }
+  label{ display:block; font-size:12px; color:var(--muted); margin:0 0 5px; font-family:"JetBrains Mono",monospace; letter-spacing:.03em; }
+  .field-wrap{ margin-bottom:14px; }
+
+  button{
+    font-family:"IBM Plex Sans",sans-serif; font-weight:700; font-size:14.5px; border:none; border-radius:8px;
+    padding:11px 18px; cursor:pointer; background:var(--amber); color:#171308;
+  }
+  button.secondary{ background:var(--surface-2); color:var(--text); border:1px solid var(--line); }
+  button.danger{ background:transparent; color:var(--danger); border:1px solid #6b3535; padding:7px 12px; font-size:13px; }
+  button.small{ padding:7px 12px; font-size:13px; }
+  button:disabled{ opacity:.5; cursor:default; }
+
+  #error-box{ color:var(--danger); font-size:13.5px; margin-top:10px; display:none; }
+  #error-box.show{ display:block; }
+
+  /* Dashboard */
+  #app-view{ display:none; }
+  .toolbar{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px; }
+  .toolbar h1{ font-size:19px; margin:0; }
+  .toolbar .count{ color:var(--muted); font-size:13px; }
+
+  table{ width:100%; border-collapse:collapse; background:var(--surface); border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+  th, td{ text-align:left; padding:11px 13px; border-bottom:1px solid var(--line); font-size:13.5px; vertical-align:top; }
+  th{ font-family:"JetBrains Mono",monospace; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:600; }
+  tr:last-child td{ border-bottom:none; }
+  td.actions{ white-space:nowrap; display:flex; gap:8px; }
+
+  .empty{ padding:30px; text-align:center; color:var(--muted); font-size:14px; }
+
+  /* Modal / form */
+  .overlay{
+    display:none; position:fixed; inset:0; background:rgba(10,12,15,.6);
+    align-items:flex-start; justify-content:center; padding:40px 16px; overflow:auto; z-index:10;
+  }
+  .overlay.show{ display:flex; }
+  .modal{
+    background:var(--surface); border:1px solid var(--line); border-radius:12px;
+    padding:26px; max-width:560px; width:100%;
+  }
+  .modal h2{ margin-top:0; font-size:18px; }
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .modal-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:18px; }
+
+  #save-status{ font-size:13px; color:var(--teal); margin-left:auto; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">JM<span>FIX</span> · admin</div>
+  <button id="logout-btn" class="secondary small">Cerrar sesión</button>
+</header>
+
+<main>
+  <section id="login-view">
+    <h1>Ingresá la contraseña</h1>
+    <p>Panel privado de gestión de órdenes.</p>
+    <div class="field-wrap">
+      <label for="password">Contraseña</label>
+      <input type="password" id="password" autocomplete="current-password" />
+    </div>
+    <button id="login-btn" style="width:100%">Entrar</button>
+    <div id="error-box"></div>
+  </section>
+
+  <section id="app-view">
+    <div class="toolbar">
+      <div>
+        <h1>Órdenes</h1>
+        <span class="count" id="order-count"></span>
+      </div>
+      <button id="new-order-btn">+ Nueva orden</button>
+    </div>
+    <div id="table-wrap"></div>
+  </section>
+</main>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h2 id="modal-title">Nueva orden</h2>
+    <form id="order-form">
+      <input type="hidden" id="original-numero" />
+      <div class="grid2">
+        <div class="field-wrap">
+          <label for="f-numero">N.º de orden *</label>
+          <input type="text" id="f-numero" required />
+        </div>
+        <div class="field-wrap">
+          <label for="f-fecha">Fecha de ingreso *</label>
+          <input type="date" id="f-fecha" required />
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="field-wrap">
+          <label for="f-cliente">Cliente</label>
+          <input type="text" id="f-cliente" placeholder="Opcional" />
+        </div>
+        <div class="field-wrap">
+          <label for="f-dispositivo">Equipo</label>
+          <input type="text" id="f-dispositivo" placeholder="Ej: iPhone 12 — pantalla" />
+        </div>
+      </div>
+      <div class="field-wrap">
+        <label for="f-estado">Estado *</label>
+        <select id="f-estado">
+          <option value="ingresado">Ingresado</option>
+          <option value="diagnosticando">En diagnóstico</option>
+          <option value="presupuestado">Presupuestado — esperando OK</option>
+          <option value="en_reparacion">En reparación</option>
+          <option value="esperando_repuesto">Esperando repuesto</option>
+          <option value="listo">Listo para retirar</option>
+          <option value="entregado">Entregado</option>
+          <option value="no_reparable">No reparable</option>
+        </select>
+      </div>
+      <div class="field-wrap">
+        <label for="f-diagnostico">Detalle del diagnóstico</label>
+        <textarea id="f-diagnostico" placeholder="Qué se detectó y qué se va a hacer"></textarea>
+      </div>
+      <div class="grid2">
+        <div class="field-wrap">
+          <label for="f-presupuesto">Presupuesto ($)</label>
+          <input type="number" id="f-presupuesto" min="0" step="1" />
+        </div>
+        <div class="field-wrap">
+          <label for="f-garantia">Garantía</label>
+          <input type="text" id="f-garantia" placeholder="Ej: 30 días" />
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="field-wrap">
+          <label for="f-total">Total a cobrar ($)</label>
+          <input type="number" id="f-total" min="0" step="1" />
+        </div>
+        <div class="field-wrap">
+          <label for="f-pagado">Pagado hasta ahora ($)</label>
+          <input type="number" id="f-pagado" min="0" step="1" />
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <span id="save-status"></span>
+        <button type="button" class="secondary" id="cancel-btn">Cancelar</button>
+        <button type="submit" id="save-btn">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+const API = "/api/orders";
+const LOGIN_API = "/api/admin-login";
+
+const ESTADOS = {
+  ingresado: "Ingresado", diagnosticando: "En diagnóstico",
+  presupuestado: "Presupuestado", en_reparacion: "En reparación",
+  esperando_repuesto: "Esperando repuesto", listo: "Listo para retirar",
+  entregado: "Entregado", no_reparable: "No reparable",
+};
+
+const loginView = document.getElementById("login-view");
+const appView = document.getElementById("app-view");
+const logoutBtn = document.getElementById("logout-btn");
+const errorBox = document.getElementById("error-box");
+const passwordInput = document.getElementById("password");
+const overlay = document.getElementById("overlay");
+const orderForm = document.getElementById("order-form");
+const saveStatus = document.getElementById("save-status");
+
+function authHeaders(){
+  return { "Content-Type": "application/json", "x-admin-password": sessionStorage.getItem("jmfix_pw") || "" };
+}
+
+function money(n){
+  const num = Number(n) || 0;
+  return num.toLocaleString("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 });
+}
+
+async function login(){
+  errorBox.classList.remove("show");
+  const password = passwordInput.value;
+  if(!password) return;
+  document.getElementById("login-btn").disabled = true;
+  try{
+    const res = await fetch(LOGIN_API, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ password }) });
+    const data = await res.json();
+    document.getElementById("login-btn").disabled = false;
+    if(!res.ok || !data.ok){
+      errorBox.textContent = data.error || "Contraseña incorrecta";
+      errorBox.classList.add("show");
+      return;
+    }
+    sessionStorage.setItem("jmfix_pw", password);
+    showApp();
+  }catch(e){
+    document.getElementById("login-btn").disabled = false;
+    errorBox.textContent = "No pudimos conectar. Probá de nuevo.";
+    errorBox.classList.add("show");
+  }
+}
+
+function showApp(){
+  loginView.style.display = "none";
+  appView.style.display = "block";
+  logoutBtn.style.display = "inline-block";
+  loadOrders();
+}
+
+document.getElementById("login-btn").addEventListener("click", login);
+passwordInput.addEventListener("keydown", (e) => { if(e.key === "Enter") login(); });
+
+logoutBtn.addEventListener("click", () => {
+  sessionStorage.removeItem("jmfix_pw");
+  location.reload();
+});
+
+// Si ya hay una contraseña guardada en esta pestaña, intenta entrar directo
+if(sessionStorage.getItem("jmfix_pw")){
+  showApp();
+}
+
+async function loadOrders(){
+  const wrap = document.getElementById("table-wrap");
+  wrap.innerHTML = `<div class="empty">Cargando…</div>`;
+  try{
+    const res = await fetch(`${API}?list=1`, { headers: authHeaders() });
+    if(res.status === 401){
+      sessionStorage.removeItem("jmfix_pw");
+      location.reload();
+      return;
+    }
+    const orders = await res.json();
+    document.getElementById("order-count").textContent = `${orders.length} orden${orders.length === 1 ? "" : "es"}`;
+    renderTable(orders);
+  }catch(e){
+    wrap.innerHTML = `<div class="empty">No pudimos cargar las órdenes. Recargá la página.</div>`;
+  }
+}
+
+function renderTable(orders){
+  const wrap = document.getElementById("table-wrap");
+  if(!orders.length){
+    wrap.innerHTML = `<div class="empty">Todavía no cargaste ninguna orden.</div>`;
+    return;
+  }
+  wrap.innerHTML = `
+    <table>
+      <thead><tr>
+        <th>N.º</th><th>Ingreso</th><th>Equipo</th><th>Estado</th><th>Saldo</th><th></th>
+      </tr></thead>
+      <tbody>
+        ${orders.map(o => {
+          const saldo = (Number(o.total)||0) - (Number(o.pagado)||0);
+          return `<tr>
+            <td class="mono">${o.numero}</td>
+            <td>${o.fechaIngreso || "—"}</td>
+            <td>${o.dispositivo || "—"}</td>
+            <td>${ESTADOS[o.estado] || o.estado || "—"}</td>
+            <td class="mono">${saldo > 0 ? money(saldo) : "Sin saldo"}</td>
+            <td class="actions">
+              <button class="secondary small" onclick='openEdit(${JSON.stringify(o).replace(/'/g,"&#39;")})'>Editar</button>
+              <button class="danger" onclick="deleteOrder('${o.numero}')">Borrar</button>
+            </td>
+          </tr>`;
+        }).join("")}
+      </tbody>
+    </table>
+  `;
+}
+
+function openNew(){
+  document.getElementById("modal-title").textContent = "Nueva orden";
+  orderForm.reset();
+  document.getElementById("original-numero").value = "";
+  document.getElementById("f-fecha").valueAsDate = new Date();
+  overlay.classList.add("show");
+}
+
+function openEdit(o){
+  document.getElementById("modal-title").textContent = `Editar orden N.º ${o.numero}`;
+  document.getElementById("original-numero").value = o.numero;
+  document.getElementById("f-numero").value = o.numero || "";
+  document.getElementById("f-fecha").value = o.fechaIngreso || "";
+  document.getElementById("f-cliente").value = o.cliente || "";
+  document.getElementById("f-dispositivo").value = o.dispositivo || "";
+  document.getElementById("f-estado").value = o.estado || "ingresado";
+  document.getElementById("f-diagnostico").value = o.detalleDiagnostico || "";
+  document.getElementById("f-presupuesto").value = o.presupuesto ?? "";
+  document.getElementById("f-garantia").value = o.garantia || "";
+  document.getElementById("f-total").value = o.total ?? "";
+  document.getElementById("f-pagado").value = o.pagado ?? "";
+  overlay.classList.add("show");
+}
+
+document.getElementById("new-order-btn").addEventListener("click", openNew);
+document.getElementById("cancel-btn").addEventListener("click", () => overlay.classList.remove("show"));
+
+async function deleteOrder(numero){
+  if(!confirm(`¿Borrar la orden N.º ${numero}? No se puede deshacer.`)) return;
+  await fetch(`${API}?numero=${encodeURIComponent(numero)}`, { method: "DELETE", headers: authHeaders() });
+  loadOrders();
+}
+
+orderForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  saveStatus.textContent = "Guardando…";
+  document.getElementById("save-btn").disabled = true;
+
+  const payload = {
+    numero: document.getElementById("f-numero").value.trim(),
+    fechaIngreso: document.getElementById("f-fecha").value,
+    cliente: document.getElementById("f-cliente").value.trim(),
+    dispositivo: document.getElementById("f-dispositivo").value.trim(),
+    estado: document.getElementById("f-estado").value,
+    detalleDiagnostico: document.getElementById("f-diagnostico").value.trim(),
+    presupuesto: document.getElementById("f-presupuesto").value ? Number(document.getElementById("f-presupuesto").value) : null,
+    garantia: document.getElementById("f-garantia").value.trim(),
+    total: document.getElementById("f-total").value ? Number(document.getElementById("f-total").value) : null,
+    pagado: document.getElementById("f-pagado").value ? Number(document.getElementById("f-pagado").value) : 0,
+  };
+
+  const originalNumero = document.getElementById("original-numero").value;
+
+  try{
+    // Si cambió el número de orden al editar, borra la entrada vieja
+    if(originalNumero && originalNumero !== payload.numero){
+      await fetch(`${API}?numero=${encodeURIComponent(originalNumero)}`, { method: "DELETE", headers: authHeaders() });
+    }
+    await fetch(API, { method: "POST", headers: authHeaders(), body: JSON.stringify(payload) });
+    saveStatus.textContent = "";
+    document.getElementById("save-btn").disabled = false;
+    overlay.classList.remove("show");
+    loadOrders();
+  }catch(err){
+    saveStatus.textContent = "Error al guardar";
+    document.getElementById("save-btn").disabled = false;
+  }
+});
+</script>
+</body>
+</html>
