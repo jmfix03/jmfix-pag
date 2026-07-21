@@ -725,41 +725,61 @@
             (c) =>
               ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c],
           );
-      function downloadOrderPdf(o) {
+      let pdfLogo;
+      async function getPdfLogo() {
+        if (pdfLogo) return pdfLogo;
+        const image = await fetch("assets/Logo-Negro.jpg");
+        const blob = await image.blob();
+        return (pdfLogo = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.readAsDataURL(blob);
+        }));
+      }
+      async function downloadOrderPdf(o) {
         const customer = clients.find((c) => c.id === o.clientId) || {};
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF();
         const saldo = (Number(o.total) || 0) - (Number(o.pagado) || 0);
-        let y = 22;
+        pdf.setFillColor(0, 191, 99);
+        pdf.rect(0, 0, 210, 32, "F");
+        pdf.setFillColor(74, 161, 37);
+        pdf.triangle(95, 0, 210, 0, 210, 32, "F");
+        try {
+          pdf.addImage(await getPdfLogo(), "JPEG", 14, 5, 22, 22);
+        } catch (e) {}
+        pdf.setTextColor(255, 255, 255);
         pdf.setFont("helvetica", "bold");
         pdf.setFontSize(20);
-        pdf.text("JM FIX", 15, y);
-        y += 10;
-        pdf.setFontSize(14);
-        pdf.text("Orden de reparación N.º " + o.numero, 15, y);
-        y += 12;
+        pdf.text("JM FIX", 42, 17);
+        pdf.setTextColor(245, 255, 247);
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(10);
+        pdf.text("Detalle de orden de reparación", 42, 24);
+        pdf.setTextColor(20, 23, 28);
+        let y = 44;
         const line = (label, value) => {
           pdf.setFont("helvetica", "bold");
-          pdf.setFontSize(10);
+          pdf.setFontSize(11);
           pdf.text(label, 15, y);
           pdf.setFont("helvetica", "normal");
-          pdf.text(String(value || "—"), 65, y);
-          y += 8;
+          pdf.text(String(value != null && value !== "" ? value : "—"), 70, y);
+          y += 9;
         };
-        line("Ingreso:", date(o.fechaIngreso));
+        pdf.setFontSize(14);
+        pdf.setFont("helvetica", "bold");
+        pdf.text("Orden N.º " + o.numero, 15, y);
+        y += 10;
+        line("Fecha de ingreso:", date(o.fechaIngreso));
         line(
           "Cliente:",
           [customer.nombre, customer.apellido].filter(Boolean).join(" "),
         );
         line("DNI:", customer.dni);
         line("Estado:", names[o.estado] || o.estado);
-        line("Garantía:", o.garantia);
-        line("Total:", o.total == null ? "—" : money(o.total));
-        line("Pagado:", money(o.pagado));
-        line("Saldo:", saldo > 0 ? money(saldo) : "Sin saldo pendiente");
-        y += 3;
+        y += 2;
         pdf.setFont("helvetica", "bold");
-        pdf.text("Diagnóstico:", 15, y);
+        pdf.text("Detalle del diagnóstico:", 15, y);
         y += 7;
         pdf.setFont("helvetica", "normal");
         const detail = pdf.splitTextToSize(
@@ -767,6 +787,30 @@
           180,
         );
         pdf.text(detail, 15, y);
+        y += detail.length * 6 + 6;
+        line("Garantía:", o.garantia);
+        line("Total:", o.total == null ? "—" : money(o.total));
+        line("Pagado:", money(o.pagado));
+        pdf.setFont("helvetica", "bold");
+        pdf.setTextColor(
+          saldo > 0 ? 200 : 20,
+          saldo > 0 ? 100 : 130,
+          saldo > 0 ? 20 : 90,
+        );
+        pdf.text(
+          "Saldo pendiente: " +
+            (saldo > 0 ? money(saldo) : "Sin saldo pendiente"),
+          15,
+          y,
+        );
+        y += 16;
+        pdf.setDrawColor(200);
+        pdf.line(15, y, 195, y);
+        y += 8;
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(9);
+        pdf.setTextColor(120);
+        pdf.text("Contactanos por WhatsApp o Instagram: [COMPLETAR]", 15, y);
         pdf.save("Orden-" + o.numero + ".pdf");
       }
       async function data() {
