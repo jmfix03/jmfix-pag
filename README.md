@@ -1,62 +1,65 @@
-# Portal JM Fix — seguimiento de órdenes
+# Portal JM Fix — Firebase
 
-Sitio para que tus clientes consulten el estado de su reparación con su número de orden (les descarga un PDF con el detalle), más un panel admin privado donde vos cargás y actualizás todo.
+Sitio estático alojado en Netlify. La página pública consulta Firestore directamente y el panel usa Firebase Authentication (correo y contraseña). No usa Netlify Functions, Blobs ni variables ADMIN_PASSWORD.
 
-## Qué incluye
+## Archivos principales
 
-- `public/index.html` → página pública. El cliente pone su número de orden y ve/descarga el PDF con:
-  número de orden, fecha de ingreso, estado, presupuesto, detalle del diagnóstico, garantía, total, pagado y saldo pendiente.
-- `public/admin.html` → panel privado (con contraseña) donde cargás, editás y borrás órdenes. No tiene ningún link desde la web pública y está bloqueado para buscadores (`robots.txt` + `noindex`).
-- `netlify/functions/orders.js` y `admin-login.js` → el "backend": guardan los datos y validan la contraseña. Sin esto no hay forma de que la web pública muestre datos reales.
-- Los datos se guardan en **Netlify Blobs**, un almacenamiento incluido gratis en Netlify. No hace falta contratar ninguna base de datos aparte.
+- public/index.html: búsqueda pública por número de orden y descarga de PDF. Solo lee publicOrders/{numero}; nunca muestra DNI ni datos del cliente.
+- public/admin.html: panel protegido por Firebase Authentication. Gestiona clientes, órdenes, presupuestos y las listas de tipos, colores y accesorios.
+- netlify.toml: configuración de hosting estático.
 
-## Lo importante sobre la seguridad del admin
+## Preparar Firebase
 
-Que la página `admin.html` no tenga links ni aparezca en Google ayuda a que no la encuentre cualquiera, pero **lo que realmente la protege es la contraseña**: aunque alguien adivine la URL, no puede ver ni editar nada sin la contraseña correcta, porque la verificación se hace del lado del servidor (la función `orders.js`), no en el navegador.
+El proyecto ya está configurado en los HTML como jmfix-pag.
 
-## Cómo publicarlo
+1. En la consola de Firebase, habilitá Authentication > Sign-in method > Correo electrónico/contraseña.
+2. En Authentication > Users, creá el usuario (correo y contraseña) que va a administrar el portal. No habilites el registro público en el sitio.
+3. Creá la base de datos de Cloud Firestore.
+4. Publicá estas reglas de Firestore. Permiten consultar individualmente una orden pública, pero no listar la colección ni acceder a datos privados sin iniciar sesión:
 
-Necesitás una cuenta gratuita en [netlify.com](https://www.netlify.com) y tener [Node.js](https://nodejs.org) instalado en tu computadora.
+    rules_version = '2';
+    service cloud.firestore {
+      match /databases/{database}/documents {
+        match /publicOrders/{numero} {
+          allow get: if true;
+          allow list: if false;
+          allow write: if request.auth != null;
+        }
+        match /orders/{numero} { allow read, write: if request.auth != null; }
+        match /clients/{clientId} { allow read, write: if request.auth != null; }
+        match /equipmentTypes/{id} { allow read, write: if request.auth != null; }
+        match /colors/{id} { allow read, write: if request.auth != null; }
+        match /accessoryOptions/{id} { allow read, write: if request.auth != null; }
+        match /counters/{id} { allow read, write: if request.auth != null; }
+      }
+    }
 
-1. Instalá la herramienta de Netlify (una sola vez):
-   ```
-   npm install -g netlify-cli
-   netlify login
-   ```
-2. Parado en esta carpeta (`jmfix-portal`), instalá la dependencia:
-   ```
-   npm install
-   ```
-3. Desplegá a producción:
-   ```
-   netlify deploy --prod
-   ```
-   La primera vez te va a preguntar si querés crear un sitio nuevo — decile que sí y elegí el nombre (va a quedar como `elnombrequeelijas.netlify.app`).
+Si agregás más usuarios autenticados, también podrán administrar el contenido con estas reglas. Para separar roles, usá custom claims.
 
-4. **Configurá tu contraseña de admin.** En el panel de Netlify (`app.netlify.com` → tu sitio → *Site configuration* → *Environment variables*) agregá una variable:
-   - Nombre: `ADMIN_PASSWORD`
-   - Valor: la contraseña que quieras usar
+## Modelo de datos
 
-   Después de agregarla, volvé a desplegar (`netlify deploy --prod`) para que la función la tome, o hacé un "Redeploy" desde el panel.
+- orders/{numero}: ficha privada completa, incluido clientId, equipo, color y accesorios.
+- publicOrders/{numero}: copia pública sin datos de cliente. Incluye número, fecha, estado, diagnóstico, presupuesto, garantía, total, pagado y saldo.
+- clients/{id}: nombre, apellido, DNI y teléfono opcional.
+- equipmentTypes, colors y accessoryOptions: opciones administrables desde el panel.
+- counters/orderNumber: contador de órdenes. La primera orden creada recibe el número 100.
 
-5. Listo. Compartí la URL principal (`https://tunombre.netlify.app`) con tus clientes, y entrá vos a `https://tunombre.netlify.app/admin.html` para cargar las órdenes.
+Al crear o modificar una orden, el panel escribe a la vez la ficha privada y la copia pública.
 
-## Cómo cargar una orden
+## Uso del panel
 
-Entrá a `/admin.html`, poné la contraseña, y con **"+ Nueva orden"** completás:
+Entrá a /admin.html e iniciá sesión. En una nueva orden elegís o creás un cliente, cargás el equipo, color, descripción, accesorios y estado. Al guardar, Firestore asigna el número en una transacción y la fecha de ingreso se genera automáticamente.
 
-- N.º de orden y fecha de ingreso
-- Cliente y equipo (opcional pero recomendado)
-- Estado (con una lista lista para elegir)
-- Detalle del diagnóstico
-- Presupuesto, garantía, total a cobrar y cuánto pagó hasta ahora — el saldo pendiente se calcula solo.
+Desde la tabla podés editar la ficha en cualquier momento o abrir Presupuesto para cargar diagnóstico, presupuesto, garantía, total y pagos. El saldo se calcula automáticamente.
 
-El cliente busca ese mismo número en la página principal y ve todo actualizado al instante.
+## Publicar en Netlify
 
-## Ideas para sumar (avisame si querés que las agregue)
+No hay build ni dependencias de servidor.
 
-- **WhatsApp directo**: un botón "Consultar por WhatsApp" en la página pública con el número de orden precargado en el mensaje.
-- **Notificación automática**: avisarte a vos (o al cliente) cuando el estado cambia a "Listo para retirar".
-- **Fotos del equipo o del diagnóstico** adjuntas a cada orden.
-- **Historial de pagos** (varios pagos parciales en vez de un solo campo "pagado").
-- **Multi-usuario** si en algún momento sumás otra persona atendiendo el local, con su propia contraseña.
+1. Creá o vinculá el sitio en Netlify.
+2. Confirmá que el directorio de publicación sea public.
+3. Desplegá con:
+
+    netlify deploy --prod
+
+También podés conectar el repositorio a Netlify y habilitar despliegues automáticos. La configuración de Firebase está embebida en el frontend; la protección real de los datos está en las reglas de Firestore y Firebase Authentication.

@@ -308,7 +308,20 @@
   </div>
 </main>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDVNn84jMtB9INNXvD8QfJ8sIJqJXlruGQ",
+  authDomain: "jmfix-pag.firebaseapp.com",
+  projectId: "jmfix-pag",
+  storageBucket: "jmfix-pag.firebasestorage.app",
+  messagingSenderId: "589641823028",
+  appId: "1:589641823028:web:9a692707d7f5da424bab61"
+};
+const db = getFirestore(initializeApp(firebaseConfig));
+
 const ESTADOS = {
   ingresado:        { label: "Ingresado",                         color: "#9aa2ad" },
   diagnosticando:   { label: "En diagnóstico",                    color: "#4dd6c4" },
@@ -334,6 +347,7 @@ function money(n){
 
 function fmtDate(d){
   if(!d) return "—";
+  if(typeof d.toDate === "function") return d.toDate().toLocaleDateString("es-AR");
   const parts = String(d).split("-");
   if(parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
   return d;
@@ -351,16 +365,16 @@ form.addEventListener("submit", async (e) => {
   submitBtn.disabled = true;
 
   try{
-    const res = await fetch(`/api/orders?numero=${encodeURIComponent(numero)}`);
-    const data = await res.json();
+    const snapshot = await getDoc(doc(db, "publicOrders", numero));
     loadingMsg.classList.remove("show");
     submitBtn.disabled = false;
 
-    if(!res.ok){
-      errorMsg.textContent = data.error || "No pudimos encontrar esa orden.";
+    if(!snapshot.exists()){
+      errorMsg.textContent = "No encontramos ninguna orden con ese número.";
       errorMsg.classList.add("show");
       return;
     }
+    const data = snapshot.data();
 
     renderResult(data);
     perforation.style.display = "block";
@@ -452,8 +466,6 @@ function generatePdf(o, opts){
   y += 10;
 
   line("Fecha de ingreso:", fmtDate(o.fechaIngreso));
-  if(o.cliente) line("Cliente:", o.cliente);
-  if(o.dispositivo) line("Equipo:", o.dispositivo);
   line("Estado:", estado.label);
   y += 2;
   doc.setFont("helvetica", "bold");

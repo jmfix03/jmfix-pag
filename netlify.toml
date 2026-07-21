@@ -1,18 +1,5 @@
 [build]
   publish = "public"
-  functions = "netlify/functions"
-
-[[redirects]]
-  from = "/api/orders"
-  to = "/.netlify/functions/orders"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/api/admin-login"
-  to = "/.netlify/functions/admin-login"
-  status = 200
-  force = true
 
 [[headers]]
   for = "/admin.html"
