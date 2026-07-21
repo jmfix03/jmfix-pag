@@ -187,6 +187,12 @@
       #app {
         display: none;
       }
+      body:not(.authenticated) > .sidebar,
+      body:not(.authenticated) > header,
+      body:not(.authenticated) #app,
+      body:not(.authenticated) .panel-view {
+        display: none !important;
+      }
       @media (max-width: 650px) {
         .grid {
           grid-template-columns: 1fr;
@@ -1025,9 +1031,16 @@
       };
       $("logout").onclick = () => signOut(auth);
       onAuthStateChanged(auth, async (u) => {
+        document.body.classList.toggle("authenticated", Boolean(u));
         $("login").style.display = u ? "none" : "block";
         $("app").style.display = u ? "block" : "none";
         $("logout").hidden = !u;
+        if (!u) {
+          document
+            .querySelectorAll(".panel-view")
+            .forEach((panel) => (panel.hidden = true));
+          return;
+        }
         if (u)
           try {
             await data();
