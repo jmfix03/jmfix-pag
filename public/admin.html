@@ -1768,6 +1768,51 @@
           (button) => (button.onclick = () => showPanel(button.dataset.view)),
         );
       showPanel("dashboard");
+      const enhancedStyle = document.createElement("style");
+      enhancedStyle.textContent = ".cash-income{color:#16803a!important}.cash-expense{color:#e5484d!important}.cash-balance-negative{color:#e5484d!important}.stage-ingresado{background:#eef1f3;color:#52606d}.stage-diagnosticando{background:#e6f5ff;color:#1677b8}.stage-presupuestado,.stage-esperando_repuesto{background:#fff4dd;color:#a86500}.stage-en_reparacion{background:#eaf7e7;color:#267b16}.stage-listo,.stage-entregado{background:#e2f7e9;color:#16803a}.stage-no_reparable{background:#ffe8e8;color:#e5484d}.stage{display:inline-block;padding:5px 8px;border-radius:999px;font-weight:700;font-size:12px}.client-filter{margin:0 0 14px}.client-orders{margin-left:8px}.catalogue-details{margin:14px 0;border:1px solid #e2e5e2;border-radius:12px;padding:0 16px}.catalogue-details summary{padding:14px 0;font-weight:700;cursor:pointer}.catalogue-details .metric{border:0;margin:0!important;padding:0 0 16px!important}";
+      document.head.append(enhancedStyle);
+      const applyStages = (root = document) => {
+        root.querySelectorAll("td").forEach((cell) => {
+          const key = Object.entries(names).find(([, label]) => label === cell.textContent.trim())?.[0];
+          if (key) cell.innerHTML = '<span class="stage stage-' + key + '">' + cell.textContent + "</span>";
+        });
+      };
+      new MutationObserver(() => {
+        applyStages($("dashboardOrdersTable"));
+        document.querySelectorAll("#dashboardCashContent .metric").forEach((card, index) => {
+          card.classList.toggle("cash-expense", index === 0);
+          card.classList.toggle("cash-income", index === 1);
+          card.classList.toggle("cash-balance-negative", index === 2 && card.textContent.includes("-"));
+        });
+        const list = $("clientsList");
+        if (list && !list.querySelector(".client-filter")) {
+          const filter = document.createElement("input");
+          filter.className = "client-filter";
+          filter.placeholder = "Filtrar por nombre, DNI, Gmail o teléfono";
+          list.before(filter);
+          filter.oninput = () => list.querySelectorAll("tbody tr").forEach(row => row.hidden = !row.textContent.toLowerCase().includes(filter.value.toLowerCase()));
+        }
+        list?.querySelectorAll("tbody tr").forEach((row, index) => {
+          if (row.querySelector(".client-orders")) return;
+          const customer = clients[index];
+          const cell = document.createElement("td");
+          const button = document.createElement("button");
+          button.className = "secondary small client-orders";
+          button.textContent = "Ver órdenes";
+          button.onclick = () => {
+            const assigned = orders.filter(order => order.clientId === customer?.id);
+            alert("Órdenes de " + (customer?.nombre || "cliente") + ": " + assigned.map(order => "#" + order.numero + " — " + (names[order.estado] || order.estado)).join("\n"));
+          };
+          cell.append(button); row.append(cell);
+        });
+        document.querySelectorAll("#catalogue > section").forEach(section => {
+          if (section.parentElement.tagName !== "DETAILS") {
+            const details = document.createElement("details"); details.className = "catalogue-details";
+            const summary = document.createElement("summary"); summary.textContent = section.querySelector("h2")?.textContent || "Opciones";
+            section.before(details); details.append(summary, section);
+          }
+        });
+      }).observe(document.body, { childList: true, subtree: true });
     </script>
   </body>
 </html>
