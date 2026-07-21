@@ -905,15 +905,22 @@
               throw Error(
                 "Seleccioná un cliente o completá nombre, apellido y DNI.",
               );
-            const normalizedDni = dni.replace(/[^0-9A-Za-z]/g, "").toLowerCase();
+            const normalizedDni = dni
+              .replace(/[^0-9A-Za-z]/g, "")
+              .toLowerCase();
             const normalizedName = nombre.toLowerCase();
             const normalizedLastName = apellido.toLowerCase();
             const duplicateClient = clients.find(
               (c) =>
-                String(c.dni || "").replace(/[^0-9A-Za-z]/g, "").toLowerCase() ===
-                  normalizedDni &&
-                String(c.nombre || "").trim().toLowerCase() === normalizedName &&
-                String(c.apellido || "").trim().toLowerCase() === normalizedLastName,
+                String(c.dni || "")
+                  .replace(/[^0-9A-Za-z]/g, "")
+                  .toLowerCase() === normalizedDni &&
+                String(c.nombre || "")
+                  .trim()
+                  .toLowerCase() === normalizedName &&
+                String(c.apellido || "")
+                  .trim()
+                  .toLowerCase() === normalizedLastName,
             );
             if (duplicateClient)
               throw Error(

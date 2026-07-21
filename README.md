@@ -1,5 +1,20 @@
 # Portal JM Fix — Firebase
 
+## Administrador autorizado
+
+El único administrador es jmfix03@gmail.com (UID c0VW8A9ciLfDzHdqNIrWm65mxII2).
+
+1. Publicá el archivo firestore.rules en Firebase Console > Firestore Database > Rules.
+2. Generá una clave JSON en Firebase Console > Project settings > Service accounts y guardala fuera del repositorio.
+3. En PowerShell ejecutá:
+
+    $env:GOOGLE_APPLICATION_CREDENTIALS = "C:\ruta\service-account-jmfix.json"
+    npm run grant-admin
+
+4. Cerrá e iniciá sesión de nuevo en admin.html.
+
+La clave JSON nunca debe subirse al repositorio.
+
 Sitio estático alojado en Netlify. La página pública consulta Firestore directamente y el panel usa Firebase Authentication (correo y contraseña). No usa Netlify Functions, Blobs ni variables ADMIN_PASSWORD.
 
 ## Archivos principales
