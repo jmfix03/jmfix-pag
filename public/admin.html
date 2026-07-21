@@ -1833,7 +1833,11 @@
       const applyStages = (root = document) => {
         root.querySelectorAll("td").forEach((cell) => {
           const key = Object.entries(names).find(([, label]) => label === cell.textContent.trim())?.[0];
-          if (key) cell.innerHTML = '<span class="stage stage-' + key + '">' + cell.textContent + "</span>";
+          if (key && !cell.querySelector(".stage"))
+            cell.innerHTML =
+              '<span class="stage stage-' + key + '">' +
+              cell.textContent +
+              "</span>";
         });
       };
       new MutationObserver(() => {
