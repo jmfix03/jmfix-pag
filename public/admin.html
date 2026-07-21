@@ -1840,7 +1840,7 @@
               "</span>";
         });
       };
-      new MutationObserver(() => {
+      const enhancePanel = () => {
         applyStages($("dashboardOrdersTable"));
         document.querySelectorAll("#dashboardCashContent .metric").forEach((card, index) => {
           card.classList.toggle("cash-expense", index === 0);
@@ -1875,7 +1875,8 @@
             section.before(details); details.append(summary, section);
           }
         });
-      }).observe(document.body, { childList: true, subtree: true });
+      };
+      enhancePanel();
     </script>
   </body>
 </html>
