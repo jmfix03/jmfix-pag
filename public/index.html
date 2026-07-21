@@ -369,6 +369,7 @@
           width: 100%;
         }
       }
+      .pdf-confirm{position:fixed;inset:0;background:#14171a77;display:grid;place-items:center;z-index:20;padding:20px}.pdf-confirm>div{max-width:390px;background:#fff;color:#14171a;border-radius:16px;padding:24px;box-shadow:0 20px 60px #0004}.pdf-confirm h2{margin-top:0}.pdf-confirm p{color:#6b7280;line-height:1.5}.pdf-confirm button{margin:12px 8px 0 0}.pdf-confirm .secondary{background:#fff;color:#14171a;border:1px solid #e2e5e2}
     </style>
     <link rel="icon" type="image/jpeg" href="assets/Logo-Negro.jpg" />
     <link
@@ -595,7 +596,6 @@
           renderResult(data);
           perforation.style.display = "block";
           result.classList.add("show");
-          generatePdf(data, { autoDownload: true });
         } catch (err) {
           loadingMsg.classList.remove("show");
           submitBtn.disabled = false;
@@ -647,9 +647,7 @@
 
         document
           .getElementById("pdf-btn")
-          .addEventListener("click", () =>
-            generatePdf(o, { autoDownload: true }),
-          );
+          .addEventListener("click", () => confirmPdfDownload(o));
       }
 
       let pdfLogo;
@@ -663,6 +661,21 @@
           reader.readAsDataURL(blob);
         }));
       }
+      function confirmPdfDownload(o) {
+        const modal = document.createElement("div");
+        modal.className = "pdf-confirm";
+        modal.innerHTML =
+          '<div><h2>¿Descargar comprobante?</h2><p>Se generará el PDF de la orden N.º ' +
+          o.numero +
+          '.</p><button class="secondary">Cancelar</button><button>Descargar PDF</button></div>';
+        modal.querySelector(".secondary").onclick = () => modal.remove();
+        modal.querySelector("button:last-child").onclick = () => {
+          modal.remove();
+          generatePdf(o, { autoDownload: true });
+        };
+        document.body.append(modal);
+      }
+
       async function generatePdf(o, opts) {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();

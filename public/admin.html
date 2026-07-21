@@ -492,6 +492,14 @@
                 <label>Teléfono</label><input id="clientPhone" />
               </div>
             </div>
+            <div class="grid">
+              <div class="field">
+                <label>Gmail</label><input id="clientEmail" type="email" />
+              </div>
+              <div class="field">
+                <label>Dirección</label><input id="clientAddress" />
+              </div>
+            </div>
           </div>
           <div class="grid">
             <div class="field">
@@ -936,6 +944,8 @@
                 apellido,
                 dni,
                 telefono: $("clientPhone").value.trim(),
+                gmail: $("clientEmail").value.trim(),
+                direccion: $("clientAddress").value.trim(),
               })
             ).id;
             await getClients();
