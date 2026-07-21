@@ -7,6 +7,7 @@ Sitio estático alojado en Netlify. La página pública consulta Firestore direc
 - public/index.html: búsqueda pública por número de orden y descarga de PDF. Solo lee publicOrders/{numero}; nunca muestra DNI ni datos del cliente.
 - public/admin.html: panel protegido por Firebase Authentication. Gestiona clientes, órdenes, presupuestos y las listas de tipos, colores y accesorios.
 - netlify.toml: configuración de hosting estático.
+- public/assets/Logo-Negro.jpg: logo usado como favicon, en el panel y en el PDF. Si se reemplaza por un PNG transparente, conservá la ruta o actualizá las referencias en ambos HTML.
 
 ## Preparar Firebase
 

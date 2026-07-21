@@ -270,6 +270,8 @@
     .input-row{ flex-direction:column; }
     button{ width:100%; }
   }
+</style><link rel="icon" type="image/jpeg" href="assets/Logo-Negro.jpg"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet"><style>
+:root{--bg:#fff;--surface:#f5f7f5;--surface-2:#fff;--line:#e2e5e2;--amber:#4aa125;--teal:#00bf63;--text:#14171a;--muted:#6b7280;--danger:#e5484d}body{font-family:Inter,sans-serif;background:linear-gradient(145deg,#fff 0%,#f5f9f5 100%);color:var(--text)}header{background:#fff;padding:18px clamp(20px,5vw,64px);border-bottom:1px solid var(--line)}.brand{color:var(--text);font-family:Manrope,sans-serif}.brand .dot{background:linear-gradient(135deg,#00bf63,#4aa125);box-shadow:none}.ticket{border-color:var(--line);box-shadow:0 20px 55px #14171a0c}.ticket:before{content:"";display:block;height:5px;background:linear-gradient(135deg,#00bf63,#4aa125);clip-path:polygon(0 0,100% 0,99% 100%,0 100%)}h1{font-family:Manrope,sans-serif;letter-spacing:-.04em}.lead{font-size:16px}input[type="text"]{background:#fff;border-color:var(--line);color:var(--text);font-family:JetBrains Mono,monospace}button{background:linear-gradient(135deg,#00bf63,#4aa125);color:#fff;box-shadow:0 7px 15px #00bf6328}.field{background:#fff;border-color:var(--line)}.field-label,.stub-label{color:var(--muted)}.status-pill{background:#f5f7f5}.pdf-btn{background:#14171a;color:#fff}.ticket-notch{background:var(--bg)}
 </style>
 </head>
 <body>
@@ -432,22 +434,32 @@ function renderResult(o){
   document.getElementById("pdf-btn").addEventListener("click", () => generatePdf(o, { autoDownload: true }));
 }
 
-function generatePdf(o, opts){
+let pdfLogo;
+async function getPdfLogo(){
+  if(pdfLogo) return pdfLogo;
+  const response = await fetch("assets/Logo-Negro.jpg");
+  const blob = await response.blob();
+  return pdfLogo = await new Promise(resolve => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.readAsDataURL(blob); });
+}
+async function generatePdf(o, opts){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
   const estado = ESTADOS[o.estado] || { label: o.estado || "—" };
   const saldo = Number(o.saldo);
 
-  doc.setFillColor(20, 23, 28);
-  doc.rect(0, 0, 210, 30, "F");
-  doc.setTextColor(255, 176, 32);
+  doc.setFillColor(0, 191, 99);
+  doc.rect(0, 0, 210, 32, "F");
+  doc.setFillColor(74, 161, 37);
+  doc.triangle(95, 0, 210, 0, 210, 32, "F");
+  try { doc.addImage(await getPdfLogo(), "JPEG", 14, 5, 22, 22); } catch(e) {}
+  doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(20);
-  doc.text("JM FIX", 15, 19);
-  doc.setTextColor(230, 230, 230);
+  doc.text("JM FIX", 42, 17);
+  doc.setTextColor(245, 255, 247);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
-  doc.text("Detalle de orden de reparación", 15, 25);
+  doc.text("Detalle de orden de reparación", 42, 24);
 
   doc.setTextColor(20, 23, 28);
   let y = 44;
@@ -492,7 +504,7 @@ function generatePdf(o, opts){
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
   doc.setTextColor(120);
-  doc.text("Este comprobante es informativo. Ante cualquier duda, contactanos por WhatsApp o Instagram.", 15, y);
+  doc.text("Contactanos por WhatsApp o Instagram: [COMPLETAR]", 15, y);
 
   if(opts && opts.autoDownload){
     doc.save(`Orden-${o.numero}.pdf`);
