@@ -1,65 +1,1736 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>JM Fix · Admin</title>
-<style>
-:root{--b:#14171c;--s:#1b1f26;--s2:#22272f;--l:#333a45;--a:#ffb020;--t:#4dd6c4;--x:#f2f0ea;--m:#9aa2ad;--d:#ff6b6b}*{box-sizing:border-box}body{margin:0;background:var(--b);color:var(--x);font:15px system-ui,sans-serif}header,main{max-width:1120px;margin:auto;padding:18px}header{max-width:none;border-bottom:1px solid var(--l);display:flex;justify-content:space-between;font-weight:800}main{padding-top:32px}input,select,textarea{width:100%;padding:10px;border:1px solid var(--l);border-radius:7px;background:var(--s2);color:var(--x);font:inherit}textarea{min-height:75px}label{display:block;margin-bottom:4px;color:var(--m);font-size:12px}.field{margin-bottom:12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}button{padding:9px 14px;border:0;border-radius:7px;background:var(--a);font-weight:700;cursor:pointer}.secondary{background:var(--s2);color:var(--x);border:1px solid var(--l)}.danger{background:transparent;color:var(--d);border:1px solid #6b3535}.small{padding:6px 9px;font-size:12px}.toolbar,.actions,.modal-actions,.add{display:flex;gap:8px;align-items:center}.toolbar{justify-content:space-between;flex-wrap:wrap;margin-bottom:18px}.search{max-width:480px;margin-bottom:14px}table{width:100%;border-collapse:collapse;background:var(--s)}th,td{padding:11px;border-bottom:1px solid var(--l);text-align:left;font-size:13px}th,.muted{color:var(--m)}.actions{white-space:nowrap}.empty{padding:30px;text-align:center;background:var(--s);color:var(--m)}.overlay{display:none;position:fixed;inset:0;z-index:2;overflow:auto;padding:25px 12px;background:#000a}.overlay.show{display:flex;align-items:flex-start;justify-content:center}.modal{width:100%;max-width:720px;padding:22px;border-radius:12px;background:var(--s);border:1px solid var(--l)}.modal-actions{justify-content:flex-end;margin-top:18px}.checks{display:flex;gap:7px;flex-wrap:wrap}.checks label{padding:6px;border:1px solid var(--l);border-radius:5px;color:var(--x)}.checks input{width:auto}.notice{font-size:13px;color:var(--t);margin-top:8px}.error{color:var(--d)}#app{display:none}@media(max-width:650px){.grid{grid-template-columns:1fr}th:nth-child(2),td:nth-child(2){display:none}}
-</style><link rel="icon" type="image/jpeg" href="assets/Logo-Negro.jpg"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet"><style>:root{--b:#fff;--s:#f5f7f5;--s2:#fff;--l:#e2e5e2;--a:#4aa125;--t:#00bf63;--x:#14171a;--m:#6b7280;--d:#e5484d}body{font-family:Inter,sans-serif;background:#fff;color:var(--x)}header{position:sticky;top:0;z-index:3;background:#fff;border:0;border-bottom:1px solid var(--l);padding:14px 28px;margin-left:248px}main{max-width:none;margin-left:248px;padding:32px 38px}.sidebar{position:fixed;inset:0 auto 0 0;width:248px;padding:26px 16px;border-right:1px solid var(--l);background:#fff;z-index:5}.brand-logo{display:block;width:104px;height:72px;object-fit:contain;margin:0 10px 36px}.nav{display:grid;gap:6px}.nav button{display:flex;width:100%;text-align:left;background:transparent;color:var(--m);border:0;padding:12px;border-radius:10px;box-shadow:none}.nav button.active,.nav button:hover{background:#eff8ed;color:#267b16}h1,h2{font-family:Manrope,sans-serif}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:0 0 26px}.metric{background:var(--s);border:1px solid var(--l);padding:20px;border-radius:14px;border-left:4px solid var(--t)}.metric strong{display:block;font:700 27px Manrope,sans-serif;margin-top:8px}.metric span{color:var(--m);font-size:13px}input,select,textarea{background:#fff;border-color:var(--l)}button{background:linear-gradient(135deg,#00bf63,#4aa125);color:#fff}.secondary{background:#fff;color:var(--x);border-color:var(--l)}table{border:1px solid var(--l);border-radius:12px;overflow:hidden;background:#fff}th{background:var(--s);color:var(--m)}.overlay{background:#14171a66}.modal{background:#fff;border-color:var(--l)}#toast{position:fixed;right:22px;bottom:22px;padding:13px 16px;border-radius:10px;background:#14171a;color:#fff;opacity:0;transition:.2s;z-index:20}#toast.show{opacity:1}@media(max-width:760px){.sidebar{transform:translateX(-100%);transition:.25s}.sidebar.open{transform:none}header,main{margin-left:0}main{padding:22px 16px}.summary{grid-template-columns:1fr}.menu-toggle{display:inline-block!important}.close-nav{display:block!important}}@media(min-width:761px){.menu-toggle,.close-nav{display:none!important}}</style></head><body><aside class="sidebar" id="sidebar"><img class="brand-logo" src="assets/Logo-Negro.jpg" alt="JM Fix"><button class="close-nav secondary small" id="closeNav">Cerrar</button><nav class="nav"><button class="active">▦ Dashboard</button><button>▤ Órdenes</button><button>♙ Clientes</button><button>⌘ Equipos y accesorios</button><button>⚙ Configuración</button></nav></aside><header><button class="menu-toggle secondary small" id="menuToggle">☰</button><span>JM Fix · administración</span><button id="logout" class="secondary small" hidden>Cerrar sesión</button></header><main>
-<section id="login"><div style="max-width:380px;margin:40px auto"><h1>Ingresá al panel</h1><p class="muted">Usá el correo y contraseña de tu cuenta de administración.</p><form id="loginForm"><div class="field"><label>Correo</label><input id="email" type="email" required></div><div class="field"><label>Contraseña</label><input id="password" type="password" required></div><button>Entrar</button><p id="loginError" class="notice error"></p></form></div></section>
-<section id="app"><div class="toolbar"><div><p class="muted">Resumen general</p><h1 style="margin:0">Dashboard</h1><span id="count" class="muted"></span></div><button id="newOrder">+ Nueva orden</button></div><div class="summary"><div class="metric"><span>Órdenes activas</span><strong id="metricActive">—</strong></div><div class="metric"><span>Listas para retirar</span><strong id="metricReady">—</strong></div><div class="metric"><span>Saldo pendiente</span><strong id="metricBalance">—</strong></div></div><h2 style="font-size:18px">Órdenes recientes</h2><input id="search" class="search" placeholder="Buscar por orden, cliente, DNI o tipo de equipo"><div id="table"><div class="empty">Cargando órdenes…</div></div></section></main><div id="toast" role="status"></div>
-<div id="orderModal" class="overlay"><div class="modal"><h2 id="orderTitle">Nueva orden</h2><form id="orderForm"><input id="editNumber" type="hidden"><div class="field"><label>Cliente</label><input id="clientSearch" placeholder="Buscar por nombre, apellido o DNI"><div id="clientResults" class="notice"></div><button id="createClient" type="button" class="secondary small">Crear cliente nuevo</button><div id="selectedClient" class="notice"></div></div><div id="clientFields" hidden><div class="grid"><div class="field"><label>Nombre *</label><input id="clientName"></div><div class="field"><label>Apellido *</label><input id="clientLast"></div></div><div class="grid"><div class="field"><label>DNI *</label><input id="clientDni"></div><div class="field"><label>Teléfono</label><input id="clientPhone"></div></div></div><div class="grid"><div class="field"><label>Tipo de equipo *</label><select id="equipment"></select><div class="add"><input id="newEquipment" placeholder="Nuevo tipo"><button type="button" class="secondary small" data-add="equipmentTypes,newEquipment">Agregar</button></div></div><div class="field"><label>Color *</label><select id="color"></select><div class="add"><input id="newColor" placeholder="Nuevo color"><button type="button" class="secondary small" data-add="colors,newColor">Agregar</button></div></div></div><div class="field"><label>Descripción libre del equipo</label><textarea id="description"></textarea></div><div class="field"><label>Accesorios</label><div id="accessories" class="checks"></div><div class="add"><input id="newAccessory" placeholder="Nuevo accesorio"><button type="button" class="secondary small" data-add="accessoryOptions,newAccessory">Agregar</button></div></div><div class="field"><label>Estado</label><select id="status"><option value="ingresado">Ingresado</option><option value="diagnosticando">En diagnóstico</option><option value="presupuestado">Presupuestado — esperando OK</option><option value="en_reparacion">En reparación</option><option value="esperando_repuesto">Esperando repuesto</option><option value="listo">Listo para retirar</option><option value="entregado">Entregado</option><option value="no_reparable">No reparable</option></select></div><div class="modal-actions"><button type="button" class="secondary close">Cancelar</button><button>Guardar orden</button></div><p id="orderMsg" class="notice error"></p></form></div></div>
-<div id="budgetModal" class="overlay"><div class="modal"><h2 id="budgetTitle">Presupuesto</h2><form id="budgetForm"><div class="field"><label>Detalle del diagnóstico</label><textarea id="diagnosis"></textarea></div><div class="grid"><div class="field"><label>Presupuesto ($)</label><input id="quote" type="number" min="0"></div><div class="field"><label>Garantía</label><input id="warranty"></div></div><div class="grid"><div class="field"><label>Total a cobrar ($)</label><input id="total" type="number" min="0"></div><div class="field"><label>Pagado hasta ahora ($)</label><input id="paid" type="number" min="0"></div></div><p id="balance" class="notice"></p><div class="modal-actions"><button type="button" class="secondary close">Cancelar</button><button>Guardar presupuesto</button></div></form></div></div>
-<script type="module">
-import{initializeApp}from"https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";import{getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut}from"https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";import{getFirestore,collection,doc,getDocs,addDoc,setDoc,deleteDoc,query,orderBy,runTransaction,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-const config={apiKey:"AIzaSyDVNn84jMtB9INNXvD8QfJ8sIJqJXlruGQ",authDomain:"jmfix-pag.firebaseapp.com",projectId:"jmfix-pag",storageBucket:"jmfix-pag.firebasestorage.app",messagingSenderId:"589641823028",appId:"1:589641823028:web:9a692707d7f5da424bab61"},db=getFirestore(initializeApp(config)),auth=getAuth(),$=x=>document.getElementById(x),names={ingresado:"Ingresado",diagnosticando:"En diagnóstico",presupuestado:"Presupuestado",en_reparacion:"En reparación",esperando_repuesto:"Esperando repuesto",listo:"Listo para retirar",entregado:"Entregado",no_reparable:"No reparable"};let orders=[],clients=[],opts={equipmentTypes:[],colors:[],accessoryOptions:[]},client=null,budgetOrder=null;const money=x=>(Number(x)||0).toLocaleString("es-AR",{style:"currency",currency:"ARS",maximumFractionDigits:0}),date=x=>x?.toDate?x.toDate().toLocaleDateString("es-AR"):"—",safe=x=>String(x??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-async function data(){await Promise.all([options(),getClients(),getOrders()])}async function options(){for(const n in opts)opts[n]=(await getDocs(collection(db,n))).docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.nombre.localeCompare(b.nombre));renderOpts()}function renderOpts(){for(const[n,id]of[["equipmentTypes","equipment"],["colors","color"]])$(id).innerHTML='<option value="">Seleccionar…</option>'+opts[n].map(x=>'<option value="'+x.id+'">'+safe(x.nombre)+'</option>').join("");$("accessories").innerHTML=opts.accessoryOptions.map(x=>'<label><input type="checkbox" value="'+x.id+'"> '+safe(x.nombre)+'</label>').join("")||'<span class="muted">Sin opciones.</span>'}async function getClients(){clients=(await getDocs(collection(db,"clients"))).docs.map(d=>({id:d.id,...d.data()}))}async function getOrders(){orders=(await getDocs(query(collection(db,"orders"),orderBy("numero","desc")))).docs.map(d=>d.data());table()}
-async function addOption(n,id){const nombre=$(id).value.trim();if(nombre){await addDoc(collection(db,n),{nombre});$(id).value="";await options()}}document.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>{const[n,id]=b.dataset.add.split(",");addOption(n,id)});
-function table(){const t=$("search").value.toLowerCase(),a=orders.filter(o=>{const c=clients.find(x=>x.id===o.clientId)||{},e=opts.equipmentTypes.find(x=>x.id===o.equipmentTypeId)||{};return[o.numero,c.nombre,c.apellido,c.dni,e.nombre].join(" ").toLowerCase().includes(t)});$("count").textContent=a.length+" orden"+(a.length===1?"":"es");$("table").innerHTML=a.length?'<table><thead><tr><th>N.º</th><th>Ingreso</th><th>Cliente</th><th>Equipo</th><th>Estado</th><th>Saldo</th><th></th></tr></thead><tbody>'+a.map(o=>{const c=clients.find(x=>x.id===o.clientId)||{},e=opts.equipmentTypes.find(x=>x.id===o.equipmentTypeId)||{};return '<tr><td>'+o.numero+'</td><td>'+date(o.fechaIngreso)+'</td><td>'+safe((c.nombre||"")+" "+(c.apellido||""))+'</td><td>'+safe(e.nombre||"—")+'</td><td>'+safe(names[o.estado]||o.estado||"—")+'</td><td>'+money((o.total||0)-(o.pagado||0))+'</td><td class="actions"><button class="secondary small" data-e="'+o.numero+'">Editar</button><button class="secondary small" data-b="'+o.numero+'">Presupuesto</button><button class="danger small" data-d="'+o.numero+'">Borrar</button></td></tr>'}).join("")+'</tbody></table>':'<div class="empty">Todavía no cargaste ninguna orden.</div>';document.querySelectorAll("[data-e]").forEach(b=>b.onclick=()=>openOrder(orders.find(o=>String(o.numero)===b.dataset.e)));document.querySelectorAll("[data-b]").forEach(b=>b.onclick=()=>openBudget(orders.find(o=>String(o.numero)===b.dataset.b)));document.querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>remove(b.dataset.d))}$("search").oninput=table;
-function select(c){client=c;$("selectedClient").textContent="Cliente seleccionado: "+c.nombre+" "+c.apellido+" · DNI "+c.dni;$("clientFields").hidden=true;$("clientResults").innerHTML=""}$("clientSearch").oninput=()=>{const t=$("clientSearch").value.trim().toLowerCase();$("clientResults").innerHTML=t.length<2?"":clients.filter(c=>(c.nombre+" "+c.apellido+" "+c.dni).toLowerCase().includes(t)).slice(0,8).map(c=>'<button type="button" class="secondary small" data-c="'+c.id+'">'+safe(c.nombre)+" "+safe(c.apellido)+" · "+safe(c.dni)+"</button>").join("")||"Sin resultados.";document.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>select(clients.find(c=>c.id===b.dataset.c)))};$("createClient").onclick=()=>{client=null;$("clientFields").hidden=false;$("selectedClient").textContent="Completá los datos del cliente nuevo."};
-function openOrder(o){$("orderForm").reset();renderOpts();client=null;$("orderMsg").textContent="";$("editNumber").value=o?.numero||"";$("orderTitle").textContent=o?"Editar orden N.º "+o.numero:"Nueva orden";if(o){select(clients.find(c=>c.id===o.clientId)||{});$("equipment").value=o.equipmentTypeId||"";$("color").value=o.color||"";$("description").value=o.descripcionEquipo||"";$("status").value=o.estado||"ingresado";document.querySelectorAll("#accessories input").forEach(x=>x.checked=(o.accesorios||[]).includes(x.value))}$("orderModal").classList.add("show")}$("newOrder").onclick=()=>openOrder();
-async function number(){return runTransaction(db,async t=>{const r=doc(db,"counters","orderNumber"),s=await t.get(r),n=(s.exists()?Number(s.data().ultimo):99)+1;t.set(r,{ultimo:n});return n})}async function save(o){const p={numero:o.numero,fechaIngreso:o.fechaIngreso,estado:o.estado,detalleDiagnostico:o.detalleDiagnostico||"",presupuesto:o.presupuesto??null,garantia:o.garantia||"",total:o.total??null,pagado:o.pagado??0,saldo:(Number(o.total)||0)-(Number(o.pagado)||0)};await Promise.all([setDoc(doc(db,"orders",String(o.numero)),o),setDoc(doc(db,"publicOrders",String(o.numero)),p)])}
-$("orderForm").onsubmit=async e=>{e.preventDefault();try{let id=client?.id;if(!id){const nombre=$("clientName").value.trim(),apellido=$("clientLast").value.trim(),dni=$("clientDni").value.trim();if(!nombre||!apellido||!dni)throw Error("Seleccioná un cliente o completá nombre, apellido y DNI.");id=(await addDoc(collection(db,"clients"),{nombre,apellido,dni,telefono:$("clientPhone").value.trim()})).id;await getClients()}const b={clientId:id,equipmentTypeId:$("equipment").value,color:$("color").value,descripcionEquipo:$("description").value.trim(),accesorios:[...document.querySelectorAll("#accessories input:checked")].map(x=>x.value),estado:$("status").value};if(!b.equipmentTypeId||!b.color)throw Error("Elegí tipo de equipo y color.");let n=$("editNumber").value,o;if(n)o={...orders.find(x=>String(x.numero)===n),...b,numero:Number(n)};else o={numero:await number(),...b,fechaIngreso:serverTimestamp(),detalleDiagnostico:"",presupuesto:null,garantia:"",total:null,pagado:0};await save(o);$("orderModal").classList.remove("show");await getOrders()}catch(x){$("orderMsg").textContent=x.message}};
-function openBudget(o){budgetOrder=o;$("budgetTitle").textContent="Presupuesto · orden N.º "+o.numero;$("diagnosis").value=o.detalleDiagnostico||"";$("quote").value=o.presupuesto??"";$("warranty").value=o.garantia||"";$("total").value=o.total??"";$("paid").value=o.pagado??"";balance();$("budgetModal").classList.add("show")}function balance(){$("balance").textContent="Saldo calculado: "+money((Number($("total").value)||0)-(Number($("paid").value)||0))}$("total").oninput=$("paid").oninput=balance;$("budgetForm").onsubmit=async e=>{e.preventDefault();const o={...budgetOrder,detalleDiagnostico:$("diagnosis").value.trim(),presupuesto:$("quote").value===""?null:Number($("quote").value),garantia:$("warranty").value.trim(),total:$("total").value===""?null:Number($("total").value),pagado:$("paid").value===""?0:Number($("paid").value)};await save(o);$("budgetModal").classList.remove("show");await getOrders()};async function remove(n){if(confirm("¿Borrar la orden N.º "+n+"?")){await Promise.all([deleteDoc(doc(db,"orders",n)),deleteDoc(doc(db,"publicOrders",n))]);await getOrders()}}document.querySelectorAll(".close").forEach(b=>b.onclick=()=>b.closest(".overlay").classList.remove("show"));
-$("loginForm").onsubmit=async e=>{e.preventDefault();try{await signInWithEmailAndPassword(auth,$("email").value,$("password").value)}catch(e){$("loginError").textContent="No se pudo iniciar sesión. Revisá el correo y la contraseña."}};$("logout").onclick=()=>signOut(auth);onAuthStateChanged(auth,async u=>{$("login").style.display=u?"none":"block";$("app").style.display=u?"block":"none";$("logout").hidden=!u;if(u)try{await data()}catch(e){$("table").innerHTML='<div class="empty">No se pudieron cargar los datos. Verificá las reglas de Firestore.</div>'}});
-const refreshDashboard=()=>{if(!$("metricActive"))return;$("metricActive").textContent=orders.filter(o=>!["entregado","no_reparable"].includes(o.estado)).length;$("metricReady").textContent=orders.filter(o=>o.estado==="listo").length;$("metricBalance").textContent=money(orders.reduce((n,o)=>n+(Number(o.total)||0)-(Number(o.pagado)||0),0))};setInterval(refreshDashboard,500);const toast=(message)=>{const el=$("toast");if(!el)return;el.textContent=message;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),2600)};const savedSave=save;save=async o=>{await savedSave(o);toast("Orden guardada correctamente")};$("menuToggle").onclick=()=>$("sidebar").classList.toggle("open");$("closeNav").onclick=()=>$("sidebar").classList.remove("open");
-/* Product extensions: models, private spare parts, real sidebar views and monthly cash. */
-opts.equipmentModels=[];
-const originalOptions=options;
-options=async()=>{await originalOptions();opts.equipmentModels=(await getDocs(collection(db,"equipmentModels"))).docs.map(d=>({id:d.id,...d.data()}));const model=$("model");if(model)model.innerHTML='<option value="">Seleccionar…</option>'+opts.equipmentModels.map(x=>'<option value="'+x.id+'">'+safe(x.nombre)+'</option>').join("")};
-document.getElementById("description")?.closest(".field")?.remove();
-document.getElementById("quote")?.closest(".field")?.remove();
-const equipmentField=$("equipment").closest(".field");if(!$("model")){const modelField=document.createElement("div");modelField.className="field";modelField.innerHTML='<label>Modelo *</label><select id="model"></select><div class="add"><input id="newModel" placeholder="Nuevo modelo"><button type="button" class="secondary small" id="addModel">Agregar</button></div>';equipmentField.parentElement.append(modelField);$("addModel").onclick=async()=>{const nombre=$("newModel").value.trim();if(!nombre)return;await addDoc(collection(db,"equipmentModels"),{nombre});$("newModel").value="";await options();toast("Modelo agregado")}};
-const reps=document.createElement("div");reps.className="field";reps.innerHTML='<label>Repuestos utilizados</label><div id="spares"></div><button type="button" class="secondary small" id="addSpare">+ Agregar repuesto</button>';document.querySelector("#orderForm .modal-actions").before(reps);
-const spareRow=r=>'<div class="grid spare"><input placeholder="Descripción" value="'+safe(r?.descripcion||"")+'"><input placeholder="Dónde comprado" value="'+safe(r?.dondeComprado||"")+'"><input type="number" min="0" placeholder="Valor" value="'+(r?.valor??"")+'"><input placeholder="Garantía" value="'+safe(r?.garantiaRepuesto||"")+'"><input type="date" value="'+(r?.fecha||new Date().toISOString().slice(0,10))+'"><button type="button" class="danger small">Quitar</button></div>';
-const addSpare=r=>{$("spares").insertAdjacentHTML("beforeend",spareRow(r));$("spares").lastElementChild.querySelector("button").onclick=e=>e.currentTarget.parentElement.remove()};$("addSpare").onclick=()=>addSpare();
-const oldOpenOrder=openOrder;openOrder=o=>{oldOpenOrder(o);$("spares").innerHTML="";(o?.repuestos||[]).forEach(addSpare);if(o)$("model").value=o.modelId||""};
-const saveBeforeProducts=save;save=async o=>{delete o.presupuesto;delete o.descripcionEquipo;o.modelId=$("model")?.value||"";o.repuestos=[...document.querySelectorAll(".spare")].map(row=>{const x=row.querySelectorAll("input");return{descripcion:x[0].value.trim(),dondeComprado:x[1].value.trim(),valor:Number(x[2].value)||0,garantiaRepuesto:x[3].value.trim(),fecha:x[4].value}}).filter(x=>x.descripcion);await saveBeforeProducts(o)};
-const previousSearch=$("clientSearch").oninput;$("clientSearch").oninput=()=>{const t=$("clientSearch").value.trim().toLowerCase();const unique=[...new Map(clients.map(c=>[c.id,c])).values()];$("clientResults").innerHTML=t.length<2?"":unique.filter(c=>(c.nombre+" "+c.apellido+" "+c.dni).toLowerCase().includes(t)).slice(0,8).map(c=>'<button type="button" class="secondary small" data-client-id="'+c.id+'">'+safe(c.nombre)+" "+safe(c.apellido)+" · "+safe(c.dni)+"</button>").join("")||"Sin resultados.";document.querySelectorAll("[data-client-id]").forEach(b=>b.onclick=()=>select(unique.find(c=>c.id===b.dataset.clientId)))};
-document.querySelector(".nav").innerHTML='<button class="active" data-view="dashboard">Dashboard</button><button data-view="orders">Órdenes</button><button data-view="clients">Clientes</button><button data-view="equipment">Equipos y accesorios</button><button data-view="cash">Caja mensual</button>';
-const makeView=(id,title,html)=>{const s=document.createElement("section");s.id="view-"+id;s.className="panel-view";s.hidden=true;s.innerHTML='<div class="toolbar"><h1>'+title+'</h1></div>'+html;$("app").after(s);return s};
-const clientView=makeView("clients","Clientes",'<div id="clientsList"></div>'),equipmentView=makeView("equipment","Equipos y accesorios",'<p class="muted">Administrá tipos, modelos, colores y accesorios desde los selectores al crear o editar una orden.</p>'),cashView=makeView("cash","Caja mensual",'<div class="field"><label>Mes</label><input id="cashMonth" type="month"></div><div id="cashContent"></div>');
-const renderClients=()=>{clientView.querySelector("#clientsList").innerHTML=clients.length?'<table><tbody>'+clients.map(c=>'<tr><td>'+safe(c.nombre+" "+c.apellido)+'</td><td>'+safe(c.dni)+'</td><td>'+safe(c.telefono||"—")+'</td></tr>').join("")+'</tbody></table>':'<div class="empty">Todavía no cargaste clientes. Creá uno desde una nueva orden.</div>'};
-const renderCash=()=>{const month=$("cashMonth").value, inMonth=x=>String(x||"").startsWith(month),spares=orders.flatMap(o=>(o.repuestos||[]).filter(r=>inMonth(r.fecha)).map(r=>({...r,numero:o.numero}))),paid=orders.filter(o=>inMonth(o.fechaIngreso?.toDate?.().toISOString().slice(0,7)));const spent=spares.reduce((n,r)=>n+(Number(r.valor)||0),0),income=paid.reduce((n,o)=>n+(Number(o.pagado)||0),0);$("cashContent").innerHTML='<div class="summary"><div class="metric"><span>Gastado en repuestos</span><strong>'+money(spent)+'</strong></div><div class="metric"><span>Ingresado</span><strong>'+money(income)+'</strong></div><div class="metric"><span>Balance</span><strong>'+money(income-spent)+'</strong></div></div><h2>Repuestos comprados</h2><div class="empty">'+(spares.length?spares.map(r=>'Orden '+r.numero+' · '+safe(r.descripcion)+' · '+money(r.valor)).join("<br>"):"Sin repuestos este mes.")+'</div><h2>Órdenes con pago</h2><div class="empty">'+(paid.length?paid.map(o=>'Orden '+o.numero+' · '+money(o.pagado)).join("<br>"):"Sin pagos este mes.")+'</div>'};$("cashMonth").value=new Date().toISOString().slice(0,7);$("cashMonth").oninput=renderCash;
-document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>{const view=b.dataset.view;document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("active",x===b));[$("app"),clientView,equipmentView,cashView].forEach(x=>x.hidden=true);if(view==="dashboard"||view==="orders"){$("app").hidden=false;if(view==="orders")$("app").querySelector("h1").textContent="Órdenes"}else if(view==="clients"){clientView.hidden=false;renderClients()}else if(view==="cash"){cashView.hidden=false;renderCash()}else document.getElementById("view-"+view).hidden=false;$("sidebar").classList.remove("open")});
-const oldBudgetOpen=openBudget;openBudget=o=>{budgetOrder=o;$("budgetTitle").textContent="Presupuesto · orden N.º "+o.numero;$("diagnosis").value=o.detalleDiagnostico||"";$("warranty").value=o.garantia||"";$("total").value=o.total??"";$("paid").value=o.pagado??"";balance();$("budgetModal").classList.add("show")};$("budgetForm").onsubmit=async e=>{e.preventDefault();const o={...budgetOrder,detalleDiagnostico:$("diagnosis").value.trim(),garantia:$("warranty").value.trim(),total:$("total").value===""?null:Number($("total").value),pagado:$("paid").value===""?0:Number($("paid").value)};delete o.presupuesto;await save(o);$("budgetModal").classList.remove("show");await getOrders()};
-const finalSave=async o=>{delete o.presupuesto;delete o.descripcionEquipo;const p={numero:o.numero,fechaIngreso:o.fechaIngreso,estado:o.estado,detalleDiagnostico:o.detalleDiagnostico||"",garantia:o.garantia||"",total:o.total??null,pagado:o.pagado??0,saldo:(Number(o.total)||0)-(Number(o.pagado)||0)};await Promise.all([setDoc(doc(db,"orders",String(o.numero)),o),setDoc(doc(db,"publicOrders",String(o.numero)),p)]);toast("Orden guardada correctamente")};save=finalSave;
-if(!$("description")){const hidden=document.createElement("input");hidden.id="description";hidden.type="hidden";$("orderForm").append(hidden)};save=async o=>{delete o.presupuesto;delete o.descripcionEquipo;o.modelId=$("model")?.value||o.modelId||"";o.repuestos=[...document.querySelectorAll(".spare")].map(row=>{const x=row.querySelectorAll("input");return{descripcion:x[0].value.trim(),dondeComprado:x[1].value.trim(),valor:Number(x[2].value)||0,garantiaRepuesto:x[3].value.trim(),fecha:x[4].value}}).filter(x=>x.descripcion);const p={numero:o.numero,fechaIngreso:o.fechaIngreso,estado:o.estado,detalleDiagnostico:o.detalleDiagnostico||"",garantia:o.garantia||"",total:o.total??null,pagado:o.pagado??0,saldo:(Number(o.total)||0)-(Number(o.pagado)||0)};await Promise.all([setDoc(doc(db,"orders",String(o.numero)),o),setDoc(doc(db,"publicOrders",String(o.numero)),p)]);toast("Orden guardada correctamente")};
-/* Keep spare parts strictly inside the private budget workflow. */
-const spareBlock=$("spares")?.parentElement;if(spareBlock){$("budgetForm").querySelector(".modal-actions").before(spareBlock);spareBlock.querySelector("label").textContent="Repuestos utilizados (solo interno)";}
-const originalBudgetForSpares=openBudget;openBudget=o=>{originalBudgetForSpares(o);$("spares").innerHTML="";(o.repuestos||[]).forEach(addSpare);};
-/* Model creation is bound once, after its dynamic control exists. */
-if($("addModel"))$("addModel").onclick=async()=>{const nombre=$("newModel").value.trim();if(!nombre)return;try{const ref=await addDoc(collection(db,"equipmentModels"),{nombre});opts.equipmentModels.push({id:ref.id,nombre});$("model").innerHTML='<option value="">Seleccionar…</option>'+opts.equipmentModels.sort((a,b)=>a.nombre.localeCompare(b.nombre)).map(x=>'<option value="'+x.id+'">'+safe(x.nombre)+'</option>').join("");$("model").value=ref.id;$("newModel").value="";toast("Modelo agregado")}catch(e){toast("No se pudo agregar el modelo")}};
-/* Dedicated orders view with status filtering. */
-const ordersView=makeView("orders","Órdenes",'<div class="toolbar"><input id="ordersSearch" class="search" placeholder="Buscar orden, cliente, DNI o equipo"><select id="ordersStatus" style="max-width:260px"><option value="">Todos los estados</option><option value="ingresado">Ingresado</option><option value="diagnosticando">En diagnóstico</option><option value="presupuestado">Presupuestado</option><option value="en_reparacion">En reparación</option><option value="esperando_repuesto">Esperando repuesto</option><option value="listo">Listo para retirar</option><option value="entregado">Entregado</option><option value="no_reparable">No reparable</option></select></div><div id="ordersTable"></div>');
-const renderOrdersOnly=()=>{const term=$("ordersSearch").value.trim().toLowerCase(),status=$("ordersStatus").value,rows=orders.filter(o=>{const c=clients.find(x=>x.id===o.clientId)||{},e=opts.equipmentTypes.find(x=>x.id===o.equipmentTypeId)||{};return(!status||o.estado===status)&&[o.numero,c.nombre,c.apellido,c.dni,e.nombre].join(" ").toLowerCase().includes(term)});$("ordersTable").innerHTML=rows.length?'<table><thead><tr><th>N.º</th><th>Ingreso</th><th>Cliente</th><th>Equipo</th><th>Estado</th><th>Saldo</th><th></th></tr></thead><tbody>'+rows.map(o=>{const c=clients.find(x=>x.id===o.clientId)||{},e=opts.equipmentTypes.find(x=>x.id===o.equipmentTypeId)||{};return '<tr><td>'+o.numero+'</td><td>'+date(o.fechaIngreso)+'</td><td>'+safe((c.nombre||"")+" "+(c.apellido||""))+'</td><td>'+safe(e.nombre||"—")+'</td><td>'+safe(names[o.estado]||o.estado)+'</td><td>'+money((o.total||0)-(o.pagado||0))+'</td><td class="actions"><button class="secondary small" data-order-edit="'+o.numero+'">Editar</button><button class="secondary small" data-order-budget="'+o.numero+'">Presupuesto</button></td></tr>'}).join("")+'</tbody></table>':'<div class="empty">No hay órdenes para este filtro.</div>';document.querySelectorAll("[data-order-edit]").forEach(b=>b.onclick=()=>openOrder(orders.find(o=>String(o.numero)===b.dataset.orderEdit)));document.querySelectorAll("[data-order-budget]").forEach(b=>b.onclick=()=>openBudget(orders.find(o=>String(o.numero)===b.dataset.orderBudget)))};
-$("ordersSearch").oninput=renderOrdersOnly;$("ordersStatus").onchange=renderOrdersOnly;
-document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>{const view=b.dataset.view;[$("app"),clientView,equipmentView,cashView,ordersView].forEach(x=>x.hidden=true);document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("active",x===b));if(view==="orders"){ordersView.hidden=false;renderOrdersOnly()}else if(view==="dashboard"){$("app").hidden=false;$("app").querySelector("h1").textContent="Dashboard"}else if(view==="clients"){clientView.hidden=false;renderClients()}else if(view==="cash"){cashView.hidden=false;renderCash()}else{equipmentView.hidden=false}$("sidebar").classList.remove("open")});
-/* Equipment catalogue: show and manage the collections in their own section. */
-equipmentView.innerHTML='<div class="toolbar"><h1>Equipos y accesorios</h1></div><p class="muted">Las opciones que agregues se usan inmediatamente al crear o editar una orden.</p><div id="catalogue"></div>';
-const catalogueConfig=[["equipmentTypes","Tipos de equipo"],["equipmentModels","Modelos"],["colors","Colores"],["accessoryOptions","Accesorios"]];
-const renderCatalogue=()=>{$("catalogue").innerHTML=catalogueConfig.map(([collectionName,title])=>'<section class="metric" style="margin:14px 0"><h2 style="font-size:18px">'+title+'</h2><div class="add"><input id="catalogue-'+collectionName+'" placeholder="Agregar नया '+title.toLowerCase().slice(0,-1)+'"><button class="small" data-catalogue-add="'+collectionName+'">Agregar</button></div><div class="checks">'+(opts[collectionName]||[]).map(x=>'<label>'+safe(x.nombre)+'</label>').join("")+'</div></section>').join("");document.querySelectorAll("[data-catalogue-add]").forEach(b=>b.onclick=async()=>{const name=b.dataset.catalogueAdd,input=$("catalogue-"+name),nombre=input.value.trim();if(!nombre)return;const ref=await addDoc(collection(db,name),{nombre});opts[name]=[...(opts[name]||[]),{id:ref.id,nombre}].sort((a,c)=>a.nombre.localeCompare(c.nombre));input.value="";renderCatalogue();renderOpts();if(name==="equipmentModels"){$("model").innerHTML='<option value="">Seleccionar…</option>'+opts.equipmentModels.map(x=>'<option value="'+x.id+'">'+safe(x.nombre)+'</option>').join("")}toast("Opción agregada")})};
-/* Dashboard: active orders only, followed by the monthly cash report. */
-const dashboardOrders=document.createElement("div");dashboardOrders.id="dashboardActiveOrders";dashboardOrders.innerHTML='<h2 style="font-size:18px">Órdenes activas</h2><div id="dashboardOrdersTable"></div><div id="dashboardCash"></div>';$("app").append(dashboardOrders);
-const renderDashboard=()=>{const active=orders.filter(o=>!["entregado","no_reparable"].includes(o.estado));$("dashboardOrdersTable").innerHTML=active.length?'<table><thead><tr><th>N.º</th><th>Cliente</th><th>Equipo</th><th>Estado</th><th>Saldo</th></tr></thead><tbody>'+active.map(o=>{const c=clients.find(x=>x.id===o.clientId)||{},e=opts.equipmentTypes.find(x=>x.id===o.equipmentTypeId)||{};return '<tr><td>'+o.numero+'</td><td>'+safe((c.nombre||"")+" "+(c.apellido||""))+'</td><td>'+safe(e.nombre||"—")+'</td><td>'+safe(names[o.estado]||o.estado)+'</td><td>'+money((o.total||0)-(o.pagado||0))+'</td></tr>'}).join("")+'</tbody></table>':'<div class="empty">No hay órdenes activas.</div>';$("dashboardCash").innerHTML='<h2 style="font-size:18px;margin-top:28px">Caja mensual</h2><div class="field"><label>Mes</label><input id="dashboardMonth" type="month"></div><div id="dashboardCashContent"></div>';$("dashboardMonth").value=new Date().toISOString().slice(0,7);const paint=()=>{const month=$("dashboardMonth").value,inMonth=x=>String(x||"").startsWith(month),spares=orders.flatMap(o=>(o.repuestos||[]).filter(r=>inMonth(r.fecha)).map(r=>({...r,numero:o.numero}))),paid=orders.filter(o=>inMonth(o.fechaIngreso?.toDate?.().toISOString().slice(0,7))),spent=spares.reduce((n,r)=>n+(Number(r.valor)||0),0),income=paid.reduce((n,o)=>n+(Number(o.pagado)||0),0);$("dashboardCashContent").innerHTML='<div class="summary"><div class="metric"><span>Gastado en repuestos</span><strong>'+money(spent)+'</strong></div><div class="metric"><span>Ingresado</span><strong>'+money(income)+'</strong></div><div class="metric"><span>Balance</span><strong>'+money(income-spent)+'</strong></div></div><div class="empty">'+(spares.length?spares.map(r=>'Orden '+r.numero+' · '+safe(r.descripcion)+' · '+money(r.valor)).join("<br>"):"Sin repuestos este mes.")+'</div>'};$("dashboardMonth").oninput=paint;paint()};
-const previousGetOrders=getOrders;getOrders=async()=>{await previousGetOrders();renderDashboard()};const previousOptionsForCatalogue=options;options=async()=>{await previousOptionsForCatalogue();if(!$("view-equipment").hidden)renderCatalogue()};
-$("search").hidden=true;$("table").hidden=true;$("search").previousElementSibling.hidden=true;document.querySelector('[data-view="cash"]')?.remove();renderDashboard();
-document.querySelector('[data-view="equipment"]').onclick=()=>{[$("app"),clientView,equipmentView,cashView,ordersView].forEach(x=>x.hidden=true);equipmentView.hidden=false;renderCatalogue();document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("active",x.dataset.view==="equipment"));$("sidebar").classList.remove("open")};
-</script></body></html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>JM Fix · Admin</title>
+    <style>
+      :root {
+        --b: #14171c;
+        --s: #1b1f26;
+        --s2: #22272f;
+        --l: #333a45;
+        --a: #ffb020;
+        --t: #4dd6c4;
+        --x: #f2f0ea;
+        --m: #9aa2ad;
+        --d: #ff6b6b;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--b);
+        color: var(--x);
+        font:
+          15px system-ui,
+          sans-serif;
+      }
+      header,
+      main {
+        max-width: 1120px;
+        margin: auto;
+        padding: 18px;
+      }
+      header {
+        max-width: none;
+        border-bottom: 1px solid var(--l);
+        display: flex;
+        justify-content: space-between;
+        font-weight: 800;
+      }
+      main {
+        padding-top: 32px;
+      }
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid var(--l);
+        border-radius: 7px;
+        background: var(--s2);
+        color: var(--x);
+        font: inherit;
+      }
+      textarea {
+        min-height: 75px;
+      }
+      label {
+        display: block;
+        margin-bottom: 4px;
+        color: var(--m);
+        font-size: 12px;
+      }
+      .field {
+        margin-bottom: 12px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      button {
+        padding: 9px 14px;
+        border: 0;
+        border-radius: 7px;
+        background: var(--a);
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .secondary {
+        background: var(--s2);
+        color: var(--x);
+        border: 1px solid var(--l);
+      }
+      .danger {
+        background: transparent;
+        color: var(--d);
+        border: 1px solid #6b3535;
+      }
+      .small {
+        padding: 6px 9px;
+        font-size: 12px;
+      }
+      .toolbar,
+      .actions,
+      .modal-actions,
+      .add {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .toolbar {
+        justify-content: space-between;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+      }
+      .search {
+        max-width: 480px;
+        margin-bottom: 14px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--s);
+      }
+      th,
+      td {
+        padding: 11px;
+        border-bottom: 1px solid var(--l);
+        text-align: left;
+        font-size: 13px;
+      }
+      th,
+      .muted {
+        color: var(--m);
+      }
+      .actions {
+        white-space: nowrap;
+      }
+      .empty {
+        padding: 30px;
+        text-align: center;
+        background: var(--s);
+        color: var(--m);
+      }
+      .overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 2;
+        overflow: auto;
+        padding: 25px 12px;
+        background: #000a;
+      }
+      .overlay.show {
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+      }
+      .modal {
+        width: 100%;
+        max-width: 720px;
+        padding: 22px;
+        border-radius: 12px;
+        background: var(--s);
+        border: 1px solid var(--l);
+      }
+      .modal-actions {
+        justify-content: flex-end;
+        margin-top: 18px;
+      }
+      .checks {
+        display: flex;
+        gap: 7px;
+        flex-wrap: wrap;
+      }
+      .checks label {
+        padding: 6px;
+        border: 1px solid var(--l);
+        border-radius: 5px;
+        color: var(--x);
+      }
+      .checks input {
+        width: auto;
+      }
+      .notice {
+        font-size: 13px;
+        color: var(--t);
+        margin-top: 8px;
+      }
+      .error {
+        color: var(--d);
+      }
+      #app {
+        display: none;
+      }
+      @media (max-width: 650px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+        th:nth-child(2),
+        td:nth-child(2) {
+          display: none;
+        }
+      }
+    </style>
+    <link rel="icon" type="image/jpeg" href="assets/Logo-Negro.jpg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Manrope:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --b: #fff;
+        --s: #f5f7f5;
+        --s2: #fff;
+        --l: #e2e5e2;
+        --a: #4aa125;
+        --t: #00bf63;
+        --x: #14171a;
+        --m: #6b7280;
+        --d: #e5484d;
+      }
+      body {
+        font-family: Inter, sans-serif;
+        background: #fff;
+        color: var(--x);
+      }
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 3;
+        background: #fff;
+        border: 0;
+        border-bottom: 1px solid var(--l);
+        padding: 14px 28px;
+        margin-left: 248px;
+      }
+      main {
+        max-width: none;
+        margin-left: 248px;
+        padding: 32px 38px;
+      }
+      .sidebar {
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: 248px;
+        padding: 26px 16px;
+        border-right: 1px solid var(--l);
+        background: #fff;
+        z-index: 5;
+      }
+      .brand-logo {
+        display: block;
+        width: 104px;
+        height: 72px;
+        object-fit: contain;
+        margin: 0 10px 36px;
+      }
+      .nav {
+        display: grid;
+        gap: 6px;
+      }
+      .nav button {
+        display: flex;
+        width: 100%;
+        text-align: left;
+        background: transparent;
+        color: var(--m);
+        border: 0;
+        padding: 12px;
+        border-radius: 10px;
+        box-shadow: none;
+      }
+      .nav button.active,
+      .nav button:hover {
+        background: #eff8ed;
+        color: #267b16;
+      }
+      h1,
+      h2 {
+        font-family: Manrope, sans-serif;
+      }
+      .summary {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin: 0 0 26px;
+      }
+      .metric {
+        background: var(--s);
+        border: 1px solid var(--l);
+        padding: 20px;
+        border-radius: 14px;
+        border-left: 4px solid var(--t);
+      }
+      .metric strong {
+        display: block;
+        font:
+          700 27px Manrope,
+          sans-serif;
+        margin-top: 8px;
+      }
+      .metric span {
+        color: var(--m);
+        font-size: 13px;
+      }
+      input,
+      select,
+      textarea {
+        background: #fff;
+        border-color: var(--l);
+      }
+      button {
+        background: linear-gradient(135deg, #00bf63, #4aa125);
+        color: #fff;
+      }
+      .secondary {
+        background: #fff;
+        color: var(--x);
+        border-color: var(--l);
+      }
+      table {
+        border: 1px solid var(--l);
+        border-radius: 12px;
+        overflow: hidden;
+        background: #fff;
+      }
+      th {
+        background: var(--s);
+        color: var(--m);
+      }
+      .overlay {
+        background: #14171a66;
+      }
+      .modal {
+        background: #fff;
+        border-color: var(--l);
+      }
+      #toast {
+        position: fixed;
+        right: 22px;
+        bottom: 22px;
+        padding: 13px 16px;
+        border-radius: 10px;
+        background: #14171a;
+        color: #fff;
+        opacity: 0;
+        transition: 0.2s;
+        z-index: 20;
+      }
+      #toast.show {
+        opacity: 1;
+      }
+      @media (max-width: 760px) {
+        .sidebar {
+          transform: translateX(-100%);
+          transition: 0.25s;
+        }
+        .sidebar.open {
+          transform: none;
+        }
+        header,
+        main {
+          margin-left: 0;
+        }
+        main {
+          padding: 22px 16px;
+        }
+        .summary {
+          grid-template-columns: 1fr;
+        }
+        .menu-toggle {
+          display: inline-block !important;
+        }
+        .close-nav {
+          display: block !important;
+        }
+      }
+      @media (min-width: 761px) {
+        .menu-toggle,
+        .close-nav {
+          display: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <aside class="sidebar" id="sidebar">
+      <img class="brand-logo" src="assets/Logo-Negro.jpg" alt="JM Fix" /><button
+        class="close-nav secondary small"
+        id="closeNav"
+      >
+        Cerrar
+      </button>
+      <nav class="nav">
+        <button class="active">▦ Dashboard</button><button>▤ Órdenes</button
+        ><button>♙ Clientes</button><button>⌘ Equipos y accesorios</button
+        ><button>⚙ Configuración</button>
+      </nav>
+    </aside>
+    <header>
+      <button class="menu-toggle secondary small" id="menuToggle">☰</button
+      ><span>JM Fix · administración</span
+      ><button id="logout" class="secondary small" hidden>Cerrar sesión</button>
+    </header>
+    <main>
+      <section id="login">
+        <div style="max-width: 380px; margin: 40px auto">
+          <h1>Ingresá al panel</h1>
+          <p class="muted">
+            Usá el correo y contraseña de tu cuenta de administración.
+          </p>
+          <form id="loginForm">
+            <div class="field">
+              <label>Correo</label><input id="email" type="email" required />
+            </div>
+            <div class="field">
+              <label>Contraseña</label
+              ><input id="password" type="password" required />
+            </div>
+            <button>Entrar</button>
+            <p id="loginError" class="notice error"></p>
+          </form>
+        </div>
+      </section>
+      <section id="app">
+        <div class="toolbar">
+          <div>
+            <p class="muted">Resumen general</p>
+            <h1 style="margin: 0">Dashboard</h1>
+            <span id="count" class="muted"></span>
+          </div>
+          <button id="newOrder">+ Nueva orden</button>
+        </div>
+        <div class="summary">
+          <div class="metric">
+            <span>Órdenes activas</span><strong id="metricActive">—</strong>
+          </div>
+          <div class="metric">
+            <span>Listas para retirar</span><strong id="metricReady">—</strong>
+          </div>
+          <div class="metric">
+            <span>Saldo pendiente</span><strong id="metricBalance">—</strong>
+          </div>
+        </div>
+        <h2 style="font-size: 18px">Órdenes recientes</h2>
+        <input
+          id="search"
+          class="search"
+          placeholder="Buscar por orden, cliente, DNI o tipo de equipo"
+        />
+        <div id="table"><div class="empty">Cargando órdenes…</div></div>
+      </section>
+    </main>
+    <div id="toast" role="status"></div>
+    <div id="orderModal" class="overlay">
+      <div class="modal">
+        <h2 id="orderTitle">Nueva orden</h2>
+        <form id="orderForm">
+          <input id="editNumber" type="hidden" />
+          <div class="field">
+            <label>Cliente</label
+            ><input
+              id="clientSearch"
+              placeholder="Buscar por nombre, apellido o DNI"
+            />
+            <div id="clientResults" class="notice"></div>
+            <button id="createClient" type="button" class="secondary small">
+              Crear cliente nuevo
+            </button>
+            <div id="selectedClient" class="notice"></div>
+          </div>
+          <div id="clientFields" hidden>
+            <div class="grid">
+              <div class="field">
+                <label>Nombre *</label><input id="clientName" />
+              </div>
+              <div class="field">
+                <label>Apellido *</label><input id="clientLast" />
+              </div>
+            </div>
+            <div class="grid">
+              <div class="field">
+                <label>DNI *</label><input id="clientDni" />
+              </div>
+              <div class="field">
+                <label>Teléfono</label><input id="clientPhone" />
+              </div>
+            </div>
+          </div>
+          <div class="grid">
+            <div class="field">
+              <label>Tipo de equipo *</label
+              ><select id="equipment"></select>
+              <div class="add">
+                <input id="newEquipment" placeholder="Nuevo tipo" /><button
+                  type="button"
+                  class="secondary small"
+                  data-add="equipmentTypes,newEquipment"
+                >
+                  Agregar
+                </button>
+              </div>
+            </div>
+            <div class="field">
+              <label>Color *</label
+              ><select id="color"></select>
+              <div class="add">
+                <input id="newColor" placeholder="Nuevo color" /><button
+                  type="button"
+                  class="secondary small"
+                  data-add="colors,newColor"
+                >
+                  Agregar
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="field">
+            <label>Descripción libre del equipo</label
+            ><textarea id="description"></textarea>
+          </div>
+          <div class="field">
+            <label>Accesorios</label>
+            <div id="accessories" class="checks"></div>
+            <div class="add">
+              <input id="newAccessory" placeholder="Nuevo accesorio" /><button
+                type="button"
+                class="secondary small"
+                data-add="accessoryOptions,newAccessory"
+              >
+                Agregar
+              </button>
+            </div>
+          </div>
+          <div class="field">
+            <label>Estado</label
+            ><select id="status">
+              <option value="ingresado">Ingresado</option>
+              <option value="diagnosticando">En diagnóstico</option>
+              <option value="presupuestado">
+                Presupuestado — esperando OK
+              </option>
+              <option value="en_reparacion">En reparación</option>
+              <option value="esperando_repuesto">Esperando repuesto</option>
+              <option value="listo">Listo para retirar</option>
+              <option value="entregado">Entregado</option>
+              <option value="no_reparable">No reparable</option>
+            </select>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="secondary close">Cancelar</button
+            ><button>Guardar orden</button>
+          </div>
+          <p id="orderMsg" class="notice error"></p>
+        </form>
+      </div>
+    </div>
+    <div id="budgetModal" class="overlay">
+      <div class="modal">
+        <h2 id="budgetTitle">Presupuesto</h2>
+        <form id="budgetForm">
+          <div class="field">
+            <label>Detalle del diagnóstico</label
+            ><textarea id="diagnosis"></textarea>
+          </div>
+          <div class="grid">
+            <div class="field">
+              <label>Presupuesto ($)</label
+              ><input id="quote" type="number" min="0" />
+            </div>
+            <div class="field">
+              <label>Garantía</label><input id="warranty" />
+            </div>
+          </div>
+          <div class="grid">
+            <div class="field">
+              <label>Total a cobrar ($)</label
+              ><input id="total" type="number" min="0" />
+            </div>
+            <div class="field">
+              <label>Pagado hasta ahora ($)</label
+              ><input id="paid" type="number" min="0" />
+            </div>
+          </div>
+          <p id="balance" class="notice"></p>
+          <div class="modal-actions">
+            <button type="button" class="secondary close">Cancelar</button
+            ><button>Guardar presupuesto</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+      import {
+        getAuth,
+        onAuthStateChanged,
+        signInWithEmailAndPassword,
+        signOut,
+      } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+      import {
+        getFirestore,
+        collection,
+        doc,
+        getDocs,
+        addDoc,
+        setDoc,
+        deleteDoc,
+        query,
+        orderBy,
+        runTransaction,
+        serverTimestamp,
+      } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+      const config = {
+          apiKey: "AIzaSyDVNn84jMtB9INNXvD8QfJ8sIJqJXlruGQ",
+          authDomain: "jmfix-pag.firebaseapp.com",
+          projectId: "jmfix-pag",
+          storageBucket: "jmfix-pag.firebasestorage.app",
+          messagingSenderId: "589641823028",
+          appId: "1:589641823028:web:9a692707d7f5da424bab61",
+        },
+        db = getFirestore(initializeApp(config)),
+        auth = getAuth(),
+        $ = (x) => document.getElementById(x),
+        names = {
+          ingresado: "Ingresado",
+          diagnosticando: "En diagnóstico",
+          presupuestado: "Presupuestado",
+          en_reparacion: "En reparación",
+          esperando_repuesto: "Esperando repuesto",
+          listo: "Listo para retirar",
+          entregado: "Entregado",
+          no_reparable: "No reparable",
+        };
+      let orders = [],
+        clients = [],
+        opts = { equipmentTypes: [], colors: [], accessoryOptions: [] },
+        client = null,
+        budgetOrder = null;
+      const money = (x) =>
+          (Number(x) || 0).toLocaleString("es-AR", {
+            style: "currency",
+            currency: "ARS",
+            maximumFractionDigits: 0,
+          }),
+        date = (x) =>
+          x?.toDate ? x.toDate().toLocaleDateString("es-AR") : "—",
+        safe = (x) =>
+          String(x ?? "").replace(
+            /[&<>"]/g,
+            (c) =>
+              ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c],
+          );
+      async function data() {
+        await Promise.all([options(), getClients(), getOrders()]);
+      }
+      async function options() {
+        for (const n in opts)
+          opts[n] = (await getDocs(collection(db, n))).docs
+            .map((d) => ({ id: d.id, ...d.data() }))
+            .sort((a, b) => a.nombre.localeCompare(b.nombre));
+        renderOpts();
+      }
+      function renderOpts() {
+        for (const [n, id] of [
+          ["equipmentTypes", "equipment"],
+          ["colors", "color"],
+        ])
+          $(id).innerHTML =
+            '<option value="">Seleccionar…</option>' +
+            opts[n]
+              .map(
+                (x) =>
+                  '<option value="' +
+                  x.id +
+                  '">' +
+                  safe(x.nombre) +
+                  "</option>",
+              )
+              .join("");
+        $("accessories").innerHTML =
+          opts.accessoryOptions
+            .map(
+              (x) =>
+                '<label><input type="checkbox" value="' +
+                x.id +
+                '"> ' +
+                safe(x.nombre) +
+                "</label>",
+            )
+            .join("") || '<span class="muted">Sin opciones.</span>';
+      }
+      async function getClients() {
+        clients = (await getDocs(collection(db, "clients"))).docs.map((d) => ({
+          id: d.id,
+          ...d.data(),
+        }));
+      }
+      async function getOrders() {
+        orders = (
+          await getDocs(
+            query(collection(db, "orders"), orderBy("numero", "desc")),
+          )
+        ).docs.map((d) => d.data());
+        table();
+      }
+      async function addOption(n, id) {
+        const nombre = $(id).value.trim();
+        if (nombre) {
+          await addDoc(collection(db, n), { nombre });
+          $(id).value = "";
+          await options();
+        }
+      }
+      document.querySelectorAll("[data-add]").forEach(
+        (b) =>
+          (b.onclick = () => {
+            const [n, id] = b.dataset.add.split(",");
+            addOption(n, id);
+          }),
+      );
+      function table() {
+        const t = $("search").value.toLowerCase(),
+          a = orders.filter((o) => {
+            const c = clients.find((x) => x.id === o.clientId) || {},
+              e =
+                opts.equipmentTypes.find((x) => x.id === o.equipmentTypeId) ||
+                {};
+            return [o.numero, c.nombre, c.apellido, c.dni, e.nombre]
+              .join(" ")
+              .toLowerCase()
+              .includes(t);
+          });
+        $("count").textContent =
+          a.length + " orden" + (a.length === 1 ? "" : "es");
+        $("table").innerHTML = a.length
+          ? "<table><thead><tr><th>N.º</th><th>Ingreso</th><th>Cliente</th><th>Equipo</th><th>Estado</th><th>Saldo</th><th></th></tr></thead><tbody>" +
+            a
+              .map((o) => {
+                const c = clients.find((x) => x.id === o.clientId) || {},
+                  e =
+                    opts.equipmentTypes.find(
+                      (x) => x.id === o.equipmentTypeId,
+                    ) || {};
+                return (
+                  "<tr><td>" +
+                  o.numero +
+                  "</td><td>" +
+                  date(o.fechaIngreso) +
+                  "</td><td>" +
+                  safe((c.nombre || "") + " " + (c.apellido || "")) +
+                  "</td><td>" +
+                  safe(e.nombre || "—") +
+                  "</td><td>" +
+                  safe(names[o.estado] || o.estado || "—") +
+                  "</td><td>" +
+                  money((o.total || 0) - (o.pagado || 0)) +
+                  '</td><td class="actions"><button class="secondary small" data-e="' +
+                  o.numero +
+                  '">Editar</button><button class="secondary small" data-b="' +
+                  o.numero +
+                  '">Presupuesto</button><button class="danger small" data-d="' +
+                  o.numero +
+                  '">Borrar</button></td></tr>'
+                );
+              })
+              .join("") +
+            "</tbody></table>"
+          : '<div class="empty">Todavía no cargaste ninguna orden.</div>';
+        document
+          .querySelectorAll("[data-e]")
+          .forEach(
+            (b) =>
+              (b.onclick = () =>
+                openOrder(
+                  orders.find((o) => String(o.numero) === b.dataset.e),
+                )),
+          );
+        document
+          .querySelectorAll("[data-b]")
+          .forEach(
+            (b) =>
+              (b.onclick = () =>
+                openBudget(
+                  orders.find((o) => String(o.numero) === b.dataset.b),
+                )),
+          );
+        document
+          .querySelectorAll("[data-d]")
+          .forEach((b) => (b.onclick = () => remove(b.dataset.d)));
+      }
+      $("search").oninput = table;
+      function select(c) {
+        client = c;
+        $("selectedClient").textContent =
+          "Cliente seleccionado: " +
+          c.nombre +
+          " " +
+          c.apellido +
+          " · DNI " +
+          c.dni;
+        $("clientFields").hidden = true;
+        $("clientResults").innerHTML = "";
+      }
+      $("clientSearch").oninput = () => {
+        const t = $("clientSearch").value.trim().toLowerCase();
+        $("clientResults").innerHTML =
+          t.length < 2
+            ? ""
+            : clients
+                .filter((c) =>
+                  (c.nombre + " " + c.apellido + " " + c.dni)
+                    .toLowerCase()
+                    .includes(t),
+                )
+                .slice(0, 8)
+                .map(
+                  (c) =>
+                    '<button type="button" class="secondary small" data-c="' +
+                    c.id +
+                    '">' +
+                    safe(c.nombre) +
+                    " " +
+                    safe(c.apellido) +
+                    " · " +
+                    safe(c.dni) +
+                    "</button>",
+                )
+                .join("") || "Sin resultados.";
+        document
+          .querySelectorAll("[data-c]")
+          .forEach(
+            (b) =>
+              (b.onclick = () =>
+                select(clients.find((c) => c.id === b.dataset.c))),
+          );
+      };
+      $("createClient").onclick = () => {
+        client = null;
+        $("clientFields").hidden = false;
+        $("selectedClient").textContent =
+          "Completá los datos del cliente nuevo.";
+      };
+      function openOrder(o) {
+        $("orderForm").reset();
+        renderOpts();
+        client = null;
+        $("orderMsg").textContent = "";
+        $("editNumber").value = o?.numero || "";
+        $("orderTitle").textContent = o
+          ? "Editar orden N.º " + o.numero
+          : "Nueva orden";
+        if (o) {
+          select(clients.find((c) => c.id === o.clientId) || {});
+          $("equipment").value = o.equipmentTypeId || "";
+          $("color").value = o.color || "";
+          $("description").value = o.descripcionEquipo || "";
+          $("status").value = o.estado || "ingresado";
+          document
+            .querySelectorAll("#accessories input")
+            .forEach(
+              (x) => (x.checked = (o.accesorios || []).includes(x.value)),
+            );
+        }
+        $("orderModal").classList.add("show");
+      }
+      $("newOrder").onclick = () => openOrder();
+      async function number() {
+        return runTransaction(db, async (t) => {
+          const r = doc(db, "counters", "orderNumber"),
+            s = await t.get(r),
+            n = (s.exists() ? Number(s.data().ultimo) : 99) + 1;
+          t.set(r, { ultimo: n });
+          return n;
+        });
+      }
+      async function save(o) {
+        const p = {
+          numero: o.numero,
+          fechaIngreso: o.fechaIngreso,
+          estado: o.estado,
+          detalleDiagnostico: o.detalleDiagnostico || "",
+          presupuesto: o.presupuesto ?? null,
+          garantia: o.garantia || "",
+          total: o.total ?? null,
+          pagado: o.pagado ?? 0,
+          saldo: (Number(o.total) || 0) - (Number(o.pagado) || 0),
+        };
+        await Promise.all([
+          setDoc(doc(db, "orders", String(o.numero)), o),
+          setDoc(doc(db, "publicOrders", String(o.numero)), p),
+        ]);
+      }
+      $("orderForm").onsubmit = async (e) => {
+        e.preventDefault();
+        try {
+          let id = client?.id;
+          if (!id) {
+            const nombre = $("clientName").value.trim(),
+              apellido = $("clientLast").value.trim(),
+              dni = $("clientDni").value.trim();
+            if (!nombre || !apellido || !dni)
+              throw Error(
+                "Seleccioná un cliente o completá nombre, apellido y DNI.",
+              );
+            const normalizedDni = dni.replace(/[^0-9A-Za-z]/g, "").toLowerCase();
+            const normalizedName = nombre.toLowerCase();
+            const normalizedLastName = apellido.toLowerCase();
+            const duplicateClient = clients.find(
+              (c) =>
+                String(c.dni || "").replace(/[^0-9A-Za-z]/g, "").toLowerCase() ===
+                  normalizedDni &&
+                String(c.nombre || "").trim().toLowerCase() === normalizedName &&
+                String(c.apellido || "").trim().toLowerCase() === normalizedLastName,
+            );
+            if (duplicateClient)
+              throw Error(
+                "Ese cliente ya existe con el mismo DNI. Seleccionalo desde el buscador.",
+              );
+            id = (
+              await addDoc(collection(db, "clients"), {
+                nombre,
+                apellido,
+                dni,
+                telefono: $("clientPhone").value.trim(),
+              })
+            ).id;
+            await getClients();
+          }
+          const b = {
+            clientId: id,
+            equipmentTypeId: $("equipment").value,
+            color: $("color").value,
+            descripcionEquipo: $("description").value.trim(),
+            accesorios: [
+              ...document.querySelectorAll("#accessories input:checked"),
+            ].map((x) => x.value),
+            estado: $("status").value,
+          };
+          if (!b.equipmentTypeId || !b.color)
+            throw Error("Elegí tipo de equipo y color.");
+          let n = $("editNumber").value,
+            o;
+          if (n)
+            o = {
+              ...orders.find((x) => String(x.numero) === n),
+              ...b,
+              numero: Number(n),
+            };
+          else
+            o = {
+              numero: await number(),
+              ...b,
+              fechaIngreso: serverTimestamp(),
+              detalleDiagnostico: "",
+              presupuesto: null,
+              garantia: "",
+              total: null,
+              pagado: 0,
+            };
+          await save(o);
+          $("orderModal").classList.remove("show");
+          await getOrders();
+        } catch (x) {
+          $("orderMsg").textContent = x.message;
+        }
+      };
+      function openBudget(o) {
+        budgetOrder = o;
+        $("budgetTitle").textContent = "Presupuesto · orden N.º " + o.numero;
+        $("diagnosis").value = o.detalleDiagnostico || "";
+        $("quote").value = o.presupuesto ?? "";
+        $("warranty").value = o.garantia || "";
+        $("total").value = o.total ?? "";
+        $("paid").value = o.pagado ?? "";
+        balance();
+        $("budgetModal").classList.add("show");
+      }
+      function balance() {
+        $("balance").textContent =
+          "Saldo calculado: " +
+          money(
+            (Number($("total").value) || 0) - (Number($("paid").value) || 0),
+          );
+      }
+      $("total").oninput = $("paid").oninput = balance;
+      $("budgetForm").onsubmit = async (e) => {
+        e.preventDefault();
+        const o = {
+          ...budgetOrder,
+          detalleDiagnostico: $("diagnosis").value.trim(),
+          presupuesto:
+            $("quote").value === "" ? null : Number($("quote").value),
+          garantia: $("warranty").value.trim(),
+          total: $("total").value === "" ? null : Number($("total").value),
+          pagado: $("paid").value === "" ? 0 : Number($("paid").value),
+        };
+        await save(o);
+        $("budgetModal").classList.remove("show");
+        await getOrders();
+      };
+      async function remove(n) {
+        if (confirm("¿Borrar la orden N.º " + n + "?")) {
+          await Promise.all([
+            deleteDoc(doc(db, "orders", n)),
+            deleteDoc(doc(db, "publicOrders", n)),
+          ]);
+          await getOrders();
+        }
+      }
+      document
+        .querySelectorAll(".close")
+        .forEach(
+          (b) =>
+            (b.onclick = () => b.closest(".overlay").classList.remove("show")),
+        );
+      $("loginForm").onsubmit = async (e) => {
+        e.preventDefault();
+        try {
+          await signInWithEmailAndPassword(
+            auth,
+            $("email").value,
+            $("password").value,
+          );
+        } catch (e) {
+          $("loginError").textContent =
+            "No se pudo iniciar sesión. Revisá el correo y la contraseña.";
+        }
+      };
+      $("logout").onclick = () => signOut(auth);
+      onAuthStateChanged(auth, async (u) => {
+        $("login").style.display = u ? "none" : "block";
+        $("app").style.display = u ? "block" : "none";
+        $("logout").hidden = !u;
+        if (u)
+          try {
+            await data();
+          } catch (e) {
+            $("table").innerHTML =
+              '<div class="empty">No se pudieron cargar los datos. Verificá las reglas de Firestore.</div>';
+          }
+      });
+      const refreshDashboard = () => {
+        if (!$("metricActive")) return;
+        $("metricActive").textContent = orders.filter(
+          (o) => !["entregado", "no_reparable"].includes(o.estado),
+        ).length;
+        $("metricReady").textContent = orders.filter(
+          (o) => o.estado === "listo",
+        ).length;
+        $("metricBalance").textContent = money(
+          orders.reduce(
+            (n, o) => n + (Number(o.total) || 0) - (Number(o.pagado) || 0),
+            0,
+          ),
+        );
+      };
+      setInterval(refreshDashboard, 500);
+      const toast = (message) => {
+        const el = $("toast");
+        if (!el) return;
+        el.textContent = message;
+        el.classList.add("show");
+        setTimeout(() => el.classList.remove("show"), 2600);
+      };
+      const savedSave = save;
+      save = async (o) => {
+        await savedSave(o);
+        toast("Orden guardada correctamente");
+      };
+      $("menuToggle").onclick = () => $("sidebar").classList.toggle("open");
+      $("closeNav").onclick = () => $("sidebar").classList.remove("open");
+      /* Product extensions: models, private spare parts, real sidebar views and monthly cash. */
+      opts.equipmentModels = [];
+      const originalOptions = options;
+      options = async () => {
+        await originalOptions();
+        opts.equipmentModels = (
+          await getDocs(collection(db, "equipmentModels"))
+        ).docs.map((d) => ({ id: d.id, ...d.data() }));
+        const model = $("model");
+        if (model)
+          model.innerHTML =
+            '<option value="">Seleccionar…</option>' +
+            opts.equipmentModels
+              .map(
+                (x) =>
+                  '<option value="' +
+                  x.id +
+                  '">' +
+                  safe(x.nombre) +
+                  "</option>",
+              )
+              .join("");
+      };
+      document.getElementById("description")?.closest(".field")?.remove();
+      document.getElementById("quote")?.closest(".field")?.remove();
+      const equipmentField = $("equipment").closest(".field");
+      if (!$("model")) {
+        const modelField = document.createElement("div");
+        modelField.className = "field";
+        modelField.innerHTML =
+          '<label>Modelo *</label><select id="model"></select><div class="add"><input id="newModel" placeholder="Nuevo modelo"><button type="button" class="secondary small" id="addModel">Agregar</button></div>';
+        equipmentField.parentElement.append(modelField);
+        $("addModel").onclick = async () => {
+          const nombre = $("newModel").value.trim();
+          if (!nombre) return;
+          await addDoc(collection(db, "equipmentModels"), { nombre });
+          $("newModel").value = "";
+          await options();
+          toast("Modelo agregado");
+        };
+      }
+      const reps = document.createElement("div");
+      reps.className = "field";
+      reps.innerHTML =
+        '<label>Repuestos utilizados</label><div id="spares"></div><button type="button" class="secondary small" id="addSpare">+ Agregar repuesto</button>';
+      document.querySelector("#orderForm .modal-actions").before(reps);
+      const spareRow = (r) =>
+        '<div class="grid spare"><input placeholder="Descripción" value="' +
+        safe(r?.descripcion || "") +
+        '"><input placeholder="Dónde comprado" value="' +
+        safe(r?.dondeComprado || "") +
+        '"><input type="number" min="0" placeholder="Valor" value="' +
+        (r?.valor ?? "") +
+        '"><input placeholder="Garantía" value="' +
+        safe(r?.garantiaRepuesto || "") +
+        '"><input type="date" value="' +
+        (r?.fecha || new Date().toISOString().slice(0, 10)) +
+        '"><button type="button" class="danger small">Quitar</button></div>';
+      const addSpare = (r) => {
+        $("spares").insertAdjacentHTML("beforeend", spareRow(r));
+        $("spares").lastElementChild.querySelector("button").onclick = (e) =>
+          e.currentTarget.parentElement.remove();
+      };
+      $("addSpare").onclick = () => addSpare();
+      const oldOpenOrder = openOrder;
+      openOrder = (o) => {
+        oldOpenOrder(o);
+        $("spares").innerHTML = "";
+        (o?.repuestos || []).forEach(addSpare);
+        if (o) $("model").value = o.modelId || "";
+      };
+      const saveBeforeProducts = save;
+      save = async (o) => {
+        delete o.presupuesto;
+        delete o.descripcionEquipo;
+        o.modelId = $("model")?.value || "";
+        o.repuestos = [...document.querySelectorAll(".spare")]
+          .map((row) => {
+            const x = row.querySelectorAll("input");
+            return {
+              descripcion: x[0].value.trim(),
+              dondeComprado: x[1].value.trim(),
+              valor: Number(x[2].value) || 0,
+              garantiaRepuesto: x[3].value.trim(),
+              fecha: x[4].value,
+            };
+          })
+          .filter((x) => x.descripcion);
+        await saveBeforeProducts(o);
+      };
+      const previousSearch = $("clientSearch").oninput;
+      $("clientSearch").oninput = () => {
+        const t = $("clientSearch").value.trim().toLowerCase();
+        const unique = [...new Map(clients.map((c) => [c.id, c])).values()];
+        $("clientResults").innerHTML =
+          t.length < 2
+            ? ""
+            : unique
+                .filter((c) =>
+                  (c.nombre + " " + c.apellido + " " + c.dni)
+                    .toLowerCase()
+                    .includes(t),
+                )
+                .slice(0, 8)
+                .map(
+                  (c) =>
+                    '<button type="button" class="secondary small" data-client-id="' +
+                    c.id +
+                    '">' +
+                    safe(c.nombre) +
+                    " " +
+                    safe(c.apellido) +
+                    " · " +
+                    safe(c.dni) +
+                    "</button>",
+                )
+                .join("") || "Sin resultados.";
+        document
+          .querySelectorAll("[data-client-id]")
+          .forEach(
+            (b) =>
+              (b.onclick = () =>
+                select(unique.find((c) => c.id === b.dataset.clientId))),
+          );
+      };
+      document.querySelector(".nav").innerHTML =
+        '<button class="active" data-view="dashboard">Dashboard</button><button data-view="orders">Órdenes</button><button data-view="clients">Clientes</button><button data-view="equipment">Equipos y accesorios</button><button data-view="cash">Caja mensual</button>';
+      const makeView = (id, title, html) => {
+        const s = document.createElement("section");
+        s.id = "view-" + id;
+        s.className = "panel-view";
+        s.hidden = true;
+        s.innerHTML =
+          '<div class="toolbar"><h1>' + title + "</h1></div>" + html;
+        $("app").after(s);
+        return s;
+      };
+      const clientView = makeView(
+          "clients",
+          "Clientes",
+          '<div id="clientsList"></div>',
+        ),
+        equipmentView = makeView(
+          "equipment",
+          "Equipos y accesorios",
+          '<p class="muted">Administrá tipos, modelos, colores y accesorios desde los selectores al crear o editar una orden.</p>',
+        ),
+        cashView = makeView(
+          "cash",
+          "Caja mensual",
+          '<div class="field"><label>Mes</label><input id="cashMonth" type="month"></div><div id="cashContent"></div>',
+        );
+      const renderClients = () => {
+        clientView.querySelector("#clientsList").innerHTML = clients.length
+          ? "<table><tbody>" +
+            clients
+              .map(
+                (c) =>
+                  "<tr><td>" +
+                  safe(c.nombre + " " + c.apellido) +
+                  "</td><td>" +
+                  safe(c.dni) +
+                  "</td><td>" +
+                  safe(c.telefono || "—") +
+                  "</td></tr>",
+              )
+              .join("") +
+            "</tbody></table>"
+          : '<div class="empty">Todavía no cargaste clientes. Creá uno desde una nueva orden.</div>';
+      };
+      const renderCash = () => {
+        const month = $("cashMonth").value,
+          inMonth = (x) => String(x || "").startsWith(month),
+          spares = orders.flatMap((o) =>
+            (o.repuestos || [])
+              .filter((r) => inMonth(r.fecha))
+              .map((r) => ({ ...r, numero: o.numero })),
+          ),
+          paid = orders.filter((o) =>
+            inMonth(o.fechaIngreso?.toDate?.().toISOString().slice(0, 7)),
+          );
+        const spent = spares.reduce((n, r) => n + (Number(r.valor) || 0), 0),
+          income = paid.reduce((n, o) => n + (Number(o.pagado) || 0), 0);
+        $("cashContent").innerHTML =
+          '<div class="summary"><div class="metric"><span>Gastado en repuestos</span><strong>' +
+          money(spent) +
+          '</strong></div><div class="metric"><span>Ingresado</span><strong>' +
+          money(income) +
+          '</strong></div><div class="metric"><span>Balance</span><strong>' +
+          money(income - spent) +
+          '</strong></div></div><h2>Repuestos comprados</h2><div class="empty">' +
+          (spares.length
+            ? spares
+                .map(
+                  (r) =>
+                    "Orden " +
+                    r.numero +
+                    " · " +
+                    safe(r.descripcion) +
+                    " · " +
+                    money(r.valor),
+                )
+                .join("<br>")
+            : "Sin repuestos este mes.") +
+          '</div><h2>Órdenes con pago</h2><div class="empty">' +
+          (paid.length
+            ? paid
+                .map((o) => "Orden " + o.numero + " · " + money(o.pagado))
+                .join("<br>")
+            : "Sin pagos este mes.") +
+          "</div>";
+      };
+      $("cashMonth").value = new Date().toISOString().slice(0, 7);
+      $("cashMonth").oninput = renderCash;
+      document.querySelectorAll("[data-view]").forEach(
+        (b) =>
+          (b.onclick = () => {
+            const view = b.dataset.view;
+            document
+              .querySelectorAll(".nav button")
+              .forEach((x) => x.classList.toggle("active", x === b));
+            [$("app"), clientView, equipmentView, cashView].forEach(
+              (x) => (x.hidden = true),
+            );
+            if (view === "dashboard" || view === "orders") {
+              $("app").hidden = false;
+              if (view === "orders")
+                $("app").querySelector("h1").textContent = "Órdenes";
+            } else if (view === "clients") {
+              clientView.hidden = false;
+              renderClients();
+            } else if (view === "cash") {
+              cashView.hidden = false;
+              renderCash();
+            } else document.getElementById("view-" + view).hidden = false;
+            $("sidebar").classList.remove("open");
+          }),
+      );
+      const oldBudgetOpen = openBudget;
+      openBudget = (o) => {
+        budgetOrder = o;
+        $("budgetTitle").textContent = "Presupuesto · orden N.º " + o.numero;
+        $("diagnosis").value = o.detalleDiagnostico || "";
+        $("warranty").value = o.garantia || "";
+        $("total").value = o.total ?? "";
+        $("paid").value = o.pagado ?? "";
+        balance();
+        $("budgetModal").classList.add("show");
+      };
+      $("budgetForm").onsubmit = async (e) => {
+        e.preventDefault();
+        const o = {
+          ...budgetOrder,
+          detalleDiagnostico: $("diagnosis").value.trim(),
+          garantia: $("warranty").value.trim(),
+          total: $("total").value === "" ? null : Number($("total").value),
+          pagado: $("paid").value === "" ? 0 : Number($("paid").value),
+        };
+        delete o.presupuesto;
+        await save(o);
+        $("budgetModal").classList.remove("show");
+        await getOrders();
+      };
+      const finalSave = async (o) => {
+        delete o.presupuesto;
+        delete o.descripcionEquipo;
+        const p = {
+          numero: o.numero,
+          fechaIngreso: o.fechaIngreso,
+          estado: o.estado,
+          detalleDiagnostico: o.detalleDiagnostico || "",
+          garantia: o.garantia || "",
+          total: o.total ?? null,
+          pagado: o.pagado ?? 0,
+          saldo: (Number(o.total) || 0) - (Number(o.pagado) || 0),
+        };
+        await Promise.all([
+          setDoc(doc(db, "orders", String(o.numero)), o),
+          setDoc(doc(db, "publicOrders", String(o.numero)), p),
+        ]);
+        toast("Orden guardada correctamente");
+      };
+      save = finalSave;
+      if (!$("description")) {
+        const hidden = document.createElement("input");
+        hidden.id = "description";
+        hidden.type = "hidden";
+        $("orderForm").append(hidden);
+      }
+      save = async (o) => {
+        delete o.presupuesto;
+        delete o.descripcionEquipo;
+        o.modelId = $("model")?.value || o.modelId || "";
+        o.repuestos = [...document.querySelectorAll(".spare")]
+          .map((row) => {
+            const x = row.querySelectorAll("input");
+            return {
+              descripcion: x[0].value.trim(),
+              dondeComprado: x[1].value.trim(),
+              valor: Number(x[2].value) || 0,
+              garantiaRepuesto: x[3].value.trim(),
+              fecha: x[4].value,
+            };
+          })
+          .filter((x) => x.descripcion);
+        const p = {
+          numero: o.numero,
+          fechaIngreso: o.fechaIngreso,
+          estado: o.estado,
+          detalleDiagnostico: o.detalleDiagnostico || "",
+          garantia: o.garantia || "",
+          total: o.total ?? null,
+          pagado: o.pagado ?? 0,
+          saldo: (Number(o.total) || 0) - (Number(o.pagado) || 0),
+        };
+        await Promise.all([
+          setDoc(doc(db, "orders", String(o.numero)), o),
+          setDoc(doc(db, "publicOrders", String(o.numero)), p),
+        ]);
+        toast("Orden guardada correctamente");
+      };
+      /* Keep spare parts strictly inside the private budget workflow. */
+      const spareBlock = $("spares")?.parentElement;
+      if (spareBlock) {
+        $("budgetForm").querySelector(".modal-actions").before(spareBlock);
+        spareBlock.querySelector("label").textContent =
+          "Repuestos utilizados (solo interno)";
+      }
+      const originalBudgetForSpares = openBudget;
+      openBudget = (o) => {
+        originalBudgetForSpares(o);
+        $("spares").innerHTML = "";
+        (o.repuestos || []).forEach(addSpare);
+      };
+      /* Model creation is bound once, after its dynamic control exists. */
+      if ($("addModel"))
+        $("addModel").onclick = async () => {
+          const nombre = $("newModel").value.trim();
+          if (!nombre) return;
+          try {
+            const ref = await addDoc(collection(db, "equipmentModels"), {
+              nombre,
+            });
+            opts.equipmentModels.push({ id: ref.id, nombre });
+            $("model").innerHTML =
+              '<option value="">Seleccionar…</option>' +
+              opts.equipmentModels
+                .sort((a, b) => a.nombre.localeCompare(b.nombre))
+                .map(
+                  (x) =>
+                    '<option value="' +
+                    x.id +
+                    '">' +
+                    safe(x.nombre) +
+                    "</option>",
+                )
+                .join("");
+            $("model").value = ref.id;
+            $("newModel").value = "";
+            toast("Modelo agregado");
+          } catch (e) {
+            toast("No se pudo agregar el modelo");
+          }
+        };
+      /* Dedicated orders view with status filtering. */
+      const ordersView = makeView(
+        "orders",
+        "Órdenes",
+        '<div class="toolbar"><input id="ordersSearch" class="search" placeholder="Buscar orden, cliente, DNI o equipo"><select id="ordersStatus" style="max-width:260px"><option value="">Todos los estados</option><option value="ingresado">Ingresado</option><option value="diagnosticando">En diagnóstico</option><option value="presupuestado">Presupuestado</option><option value="en_reparacion">En reparación</option><option value="esperando_repuesto">Esperando repuesto</option><option value="listo">Listo para retirar</option><option value="entregado">Entregado</option><option value="no_reparable">No reparable</option></select></div><div id="ordersTable"></div>',
+      );
+      const renderOrdersOnly = () => {
+        const term = $("ordersSearch").value.trim().toLowerCase(),
+          status = $("ordersStatus").value,
+          rows = orders.filter((o) => {
+            const c = clients.find((x) => x.id === o.clientId) || {},
+              e =
+                opts.equipmentTypes.find((x) => x.id === o.equipmentTypeId) ||
+                {};
+            return (
+              (!status || o.estado === status) &&
+              [o.numero, c.nombre, c.apellido, c.dni, e.nombre]
+                .join(" ")
+                .toLowerCase()
+                .includes(term)
+            );
+          });
+        $("ordersTable").innerHTML = rows.length
+          ? "<table><thead><tr><th>N.º</th><th>Ingreso</th><th>Cliente</th><th>Equipo</th><th>Estado</th><th>Saldo</th><th></th></tr></thead><tbody>" +
+            rows
+              .map((o) => {
+                const c = clients.find((x) => x.id === o.clientId) || {},
+                  e =
+                    opts.equipmentTypes.find(
+                      (x) => x.id === o.equipmentTypeId,
+                    ) || {};
+                return (
+                  "<tr><td>" +
+                  o.numero +
+                  "</td><td>" +
+                  date(o.fechaIngreso) +
+                  "</td><td>" +
+                  safe((c.nombre || "") + " " + (c.apellido || "")) +
+                  "</td><td>" +
+                  safe(e.nombre || "—") +
+                  "</td><td>" +
+                  safe(names[o.estado] || o.estado) +
+                  "</td><td>" +
+                  money((o.total || 0) - (o.pagado || 0)) +
+                  '</td><td class="actions"><button class="secondary small" data-order-edit="' +
+                  o.numero +
+                  '">Editar</button><button class="secondary small" data-order-budget="' +
+                  o.numero +
+                  '">Presupuesto</button></td></tr>'
+                );
+              })
+              .join("") +
+            "</tbody></table>"
+          : '<div class="empty">No hay órdenes para este filtro.</div>';
+        document
+          .querySelectorAll("[data-order-edit]")
+          .forEach(
+            (b) =>
+              (b.onclick = () =>
+                openOrder(
+                  orders.find((o) => String(o.numero) === b.dataset.orderEdit),
+                )),
+          );
+        document
+          .querySelectorAll("[data-order-budget]")
+          .forEach(
+            (b) =>
+              (b.onclick = () =>
+                openBudget(
+                  orders.find(
+                    (o) => String(o.numero) === b.dataset.orderBudget,
+                  ),
+                )),
+          );
+      };
+      $("ordersSearch").oninput = renderOrdersOnly;
+      $("ordersStatus").onchange = renderOrdersOnly;
+      document.querySelectorAll("[data-view]").forEach(
+        (b) =>
+          (b.onclick = () => {
+            const view = b.dataset.view;
+            [$("app"), clientView, equipmentView, cashView, ordersView].forEach(
+              (x) => (x.hidden = true),
+            );
+            document
+              .querySelectorAll(".nav button")
+              .forEach((x) => x.classList.toggle("active", x === b));
+            if (view === "orders") {
+              ordersView.hidden = false;
+              renderOrdersOnly();
+            } else if (view === "dashboard") {
+              $("app").hidden = false;
+              $("app").querySelector("h1").textContent = "Dashboard";
+            } else if (view === "clients") {
+              clientView.hidden = false;
+              renderClients();
+            } else if (view === "cash") {
+              cashView.hidden = false;
+              renderCash();
+            } else {
+              equipmentView.hidden = false;
+            }
+            $("sidebar").classList.remove("open");
+          }),
+      );
+      /* Equipment catalogue: show and manage the collections in their own section. */
+      equipmentView.innerHTML =
+        '<div class="toolbar"><h1>Equipos y accesorios</h1></div><p class="muted">Las opciones que agregues se usan inmediatamente al crear o editar una orden.</p><div id="catalogue"></div>';
+      const catalogueConfig = [
+        ["equipmentTypes", "Tipos de equipo"],
+        ["equipmentModels", "Modelos"],
+        ["colors", "Colores"],
+        ["accessoryOptions", "Accesorios"],
+      ];
+      const renderCatalogue = () => {
+        $("catalogue").innerHTML = catalogueConfig
+          .map(
+            ([collectionName, title]) =>
+              '<section class="metric" style="margin:14px 0"><h2 style="font-size:18px">' +
+              title +
+              '</h2><div class="add"><input id="catalogue-' +
+              collectionName +
+              '" placeholder="Agregar ' +
+              title.toLowerCase().slice(0, -1) +
+              '"><button class="small" data-catalogue-add="' +
+              collectionName +
+              '">Agregar</button></div><div class="checks">' +
+              (opts[collectionName] || [])
+                .map((x) => "<label>" + safe(x.nombre) + "</label>")
+                .join("") +
+              "</div></section>",
+          )
+          .join("");
+        document.querySelectorAll("[data-catalogue-add]").forEach(
+          (b) =>
+            (b.onclick = async () => {
+              const name = b.dataset.catalogueAdd,
+                input = $("catalogue-" + name),
+                nombre = input.value.trim();
+              if (!nombre) return;
+              const ref = await addDoc(collection(db, name), { nombre });
+              opts[name] = [...(opts[name] || []), { id: ref.id, nombre }].sort(
+                (a, c) => a.nombre.localeCompare(c.nombre),
+              );
+              input.value = "";
+              renderCatalogue();
+              renderOpts();
+              if (name === "equipmentModels") {
+                $("model").innerHTML =
+                  '<option value="">Seleccionar…</option>' +
+                  opts.equipmentModels
+                    .map(
+                      (x) =>
+                        '<option value="' +
+                        x.id +
+                        '">' +
+                        safe(x.nombre) +
+                        "</option>",
+                    )
+                    .join("");
+              }
+              toast("Opción agregada");
+            }),
+        );
+      };
+      /* Dashboard: active orders only, followed by the monthly cash report. */
+      const dashboardOrders = document.createElement("div");
+      dashboardOrders.id = "dashboardActiveOrders";
+      dashboardOrders.innerHTML =
+        '<h2 style="font-size:18px">Órdenes activas</h2><div id="dashboardOrdersTable"></div><div id="dashboardCash"></div>';
+      $("app").append(dashboardOrders);
+      const renderDashboard = () => {
+        const active = orders.filter(
+          (o) => !["entregado", "no_reparable"].includes(o.estado),
+        );
+        $("dashboardOrdersTable").innerHTML = active.length
+          ? "<table><thead><tr><th>N.º</th><th>Cliente</th><th>Equipo</th><th>Estado</th><th>Saldo</th></tr></thead><tbody>" +
+            active
+              .map((o) => {
+                const c = clients.find((x) => x.id === o.clientId) || {},
+                  e =
+                    opts.equipmentTypes.find(
+                      (x) => x.id === o.equipmentTypeId,
+                    ) || {};
+                return (
+                  "<tr><td>" +
+                  o.numero +
+                  "</td><td>" +
+                  safe((c.nombre || "") + " " + (c.apellido || "")) +
+                  "</td><td>" +
+                  safe(e.nombre || "—") +
+                  "</td><td>" +
+                  safe(names[o.estado] || o.estado) +
+                  "</td><td>" +
+                  money((o.total || 0) - (o.pagado || 0)) +
+                  "</td></tr>"
+                );
+              })
+              .join("") +
+            "</tbody></table>"
+          : '<div class="empty">No hay órdenes activas.</div>';
+        $("dashboardCash").innerHTML =
+          '<h2 style="font-size:18px;margin-top:28px">Caja mensual</h2><div class="field"><label>Mes</label><input id="dashboardMonth" type="month"></div><div id="dashboardCashContent"></div>';
+        $("dashboardMonth").value = new Date().toISOString().slice(0, 7);
+        const paint = () => {
+          const month = $("dashboardMonth").value,
+            inMonth = (x) => String(x || "").startsWith(month),
+            spares = orders.flatMap((o) =>
+              (o.repuestos || [])
+                .filter((r) => inMonth(r.fecha))
+                .map((r) => ({ ...r, numero: o.numero })),
+            ),
+            paid = orders.filter((o) =>
+              inMonth(o.fechaIngreso?.toDate?.().toISOString().slice(0, 7)),
+            ),
+            spent = spares.reduce((n, r) => n + (Number(r.valor) || 0), 0),
+            income = paid.reduce((n, o) => n + (Number(o.pagado) || 0), 0);
+          $("dashboardCashContent").innerHTML =
+            '<div class="summary"><div class="metric"><span>Gastado en repuestos</span><strong>' +
+            money(spent) +
+            '</strong></div><div class="metric"><span>Ingresado</span><strong>' +
+            money(income) +
+            '</strong></div><div class="metric"><span>Balance</span><strong>' +
+            money(income - spent) +
+            '</strong></div></div><div class="empty">' +
+            (spares.length
+              ? spares
+                  .map(
+                    (r) =>
+                      "Orden " +
+                      r.numero +
+                      " · " +
+                      safe(r.descripcion) +
+                      " · " +
+                      money(r.valor),
+                  )
+                  .join("<br>")
+              : "Sin repuestos este mes.") +
+            "</div>";
+        };
+        $("dashboardMonth").oninput = paint;
+        paint();
+      };
+      const previousGetOrders = getOrders;
+      getOrders = async () => {
+        await previousGetOrders();
+        renderDashboard();
+      };
+      const previousOptionsForCatalogue = options;
+      options = async () => {
+        await previousOptionsForCatalogue();
+        if (!$("view-equipment").hidden) renderCatalogue();
+      };
+      $("search").hidden = true;
+      $("table").hidden = true;
+      $("search").previousElementSibling.hidden = true;
+      document.querySelector('[data-view="cash"]')?.remove();
+      renderDashboard();
+      document.querySelector('[data-view="equipment"]').onclick = () => {
+        [$("app"), clientView, equipmentView, cashView, ordersView].forEach(
+          (x) => (x.hidden = true),
+        );
+        equipmentView.hidden = false;
+        renderCatalogue();
+        document
+          .querySelectorAll(".nav button")
+          .forEach((x) =>
+            x.classList.toggle("active", x.dataset.view === "equipment"),
+          );
+        $("sidebar").classList.remove("open");
+      };
+      const showPanel = (view) => {
+        const panels = {
+          dashboard: $("app"),
+          orders: ordersView,
+          clients: clientView,
+          equipment: equipmentView,
+        };
+        Object.entries(panels).forEach(([name, panel]) => {
+          panel.hidden = name !== view;
+        });
+        document
+          .querySelectorAll(".nav [data-view]")
+          .forEach((button) =>
+            button.classList.toggle("active", button.dataset.view === view),
+          );
+        if (view === "dashboard") {
+          $("app").querySelector("h1").textContent = "Dashboard";
+          renderDashboard();
+        }
+        if (view === "orders") renderOrdersOnly();
+        if (view === "clients") renderClients();
+        if (view === "equipment") renderCatalogue();
+        $("sidebar").classList.remove("open");
+      };
+      document
+        .querySelectorAll(".nav [data-view]")
+        .forEach(
+          (button) => (button.onclick = () => showPanel(button.dataset.view)),
+        );
+      showPanel("dashboard");
+    </script>
+  </body>
+</html>
