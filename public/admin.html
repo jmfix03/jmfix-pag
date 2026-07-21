@@ -197,6 +197,16 @@
       body:not(.authenticated) .panel-view {
         display: none !important;
       }
+      body.authenticated .overlay:not(.show) {
+        display: none !important;
+        pointer-events: none !important;
+      }
+      body.authenticated > .sidebar,
+      body.authenticated > header,
+      body.authenticated > main,
+      body.authenticated .panel-view {
+        pointer-events: auto;
+      }
       @media (max-width: 650px) {
         .grid {
           grid-template-columns: 1fr;
