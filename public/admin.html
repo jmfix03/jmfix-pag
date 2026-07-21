@@ -388,6 +388,54 @@
         }
       }
     </style>
+    <style>
+      body:not(.authenticated) {
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at 15% 10%, #00bf6318, transparent 32rem),
+          linear-gradient(135deg, #f7faf7, #ffffff 58%, #edf8ef);
+      }
+      body:not(.authenticated) main {
+        min-height: 100vh;
+        margin: 0;
+        padding: 24px;
+        display: grid;
+        place-items: center;
+      }
+      #login { width: min(100%, 430px); }
+      .login-card {
+        padding: clamp(28px, 7vw, 44px);
+        background: #fff;
+        border: 1px solid #e2e5e2;
+        border-radius: 22px;
+        box-shadow: 0 22px 60px #14171a14;
+      }
+      .login-logo {
+        display: block;
+        width: 104px;
+        height: 84px;
+        margin: 0 auto 24px;
+        object-fit: contain;
+      }
+      .login-card h1 {
+        margin: 0 0 8px;
+        text-align: center;
+        font-size: 26px;
+      }
+      .login-card .muted {
+        margin: 0 0 28px;
+        text-align: center;
+        line-height: 1.55;
+      }
+      .login-card label { font-weight: 600; color: #4b5563; }
+      .login-card input { padding: 13px 14px; }
+      .login-submit { width: 100%; margin-top: 8px; padding: 13px; }
+      #loginError { min-height: 20px; text-align: center; }
+      @media (max-width: 480px) {
+        body:not(.authenticated) main { padding: 16px; }
+        .login-card { padding: 28px 22px; border-radius: 18px; }
+      }
+    </style>
   </head>
   <body>
     <aside class="sidebar" id="sidebar">
@@ -410,7 +458,8 @@
     </header>
     <main>
       <section id="login">
-        <div style="max-width: 380px; margin: 40px auto">
+        <div class="login-card">
+          <img class="login-logo" src="assets/Logo-Negro.jpg" alt="JM Fix" />
           <h1>Ingresá al panel</h1>
           <p class="muted">
             Usá el correo y contraseña de tu cuenta de administración.
@@ -423,7 +472,7 @@
               <label>Contraseña</label
               ><input id="password" type="password" required />
             </div>
-            <button>Entrar</button>
+            <button class="login-submit">Entrar al panel</button>
             <p id="loginError" class="notice error"></p>
           </form>
         </div>
