@@ -1088,6 +1088,8 @@
             deleteDoc(doc(db, "publicOrders", n)),
           ]);
           await getOrders();
+          if (!ordersView.hidden) renderOrdersOnly();
+          toast("Orden eliminada correctamente");
         }
       }
       document
@@ -1313,7 +1315,7 @@
         );
       const renderClients = () => {
         clientView.querySelector("#clientsList").innerHTML = clients.length
-          ? "<table><tbody>" +
+          ? "<table><thead><tr><th>Cliente</th><th>DNI</th><th>Teléfono</th><th></th></tr></thead><tbody>" +
             clients
               .map(
                 (c) =>
@@ -1323,12 +1325,38 @@
                   safe(c.dni) +
                   "</td><td>" +
                   safe(c.telefono || "—") +
-                  "</td></tr>",
+                  '</td><td class="actions"><button class="danger small" data-client-delete="' +
+                  c.id +
+                  '">Borrar</button></td></tr>',
               )
               .join("") +
             "</tbody></table>"
           : '<div class="empty">Todavía no cargaste clientes. Creá uno desde una nueva orden.</div>';
+        clientView.querySelectorAll("[data-client-delete]").forEach(
+          (b) => (b.onclick = () => removeClient(b.dataset.clientDelete)),
+        );
       };
+      async function removeClient(id) {
+        const customer = clients.find((c) => c.id === id);
+        const assigned = orders.filter((o) => o.clientId === id);
+        if (assigned.length) {
+          alert(
+            "No se puede borrar a " +
+              (customer?.nombre || "este cliente") +
+              " porque tiene " +
+              assigned.length +
+              " orden" +
+              (assigned.length === 1 ? " asociada." : "es asociadas."),
+          );
+          return;
+        }
+        if (confirm("¿Borrar a " + (customer?.nombre || "este cliente") + "?")) {
+          await deleteDoc(doc(db, "clients", id));
+          await getClients();
+          renderClients();
+          toast("Cliente eliminado correctamente");
+        }
+      }
       const renderCash = () => {
         const month = $("cashMonth").value,
           inMonth = (x) => String(x || "").startsWith(month),
@@ -1571,7 +1599,9 @@
                   o.numero +
                   '">Editar</button><button class="secondary small" data-order-budget="' +
                   o.numero +
-                  '">Presupuesto</button></td></tr>'
+                  '">Presupuesto</button><button class="danger small" data-order-delete="' +
+                  o.numero +
+                  '">Borrar</button></td></tr>'
                 );
               })
               .join("") +
@@ -1597,6 +1627,9 @@
                   ),
                 )),
           );
+        document
+          .querySelectorAll("[data-order-delete]")
+          .forEach((b) => (b.onclick = () => remove(b.dataset.orderDelete)));
       };
       $("ordersSearch").oninput = renderOrdersOnly;
       $("ordersStatus").onchange = renderOrdersOnly;
