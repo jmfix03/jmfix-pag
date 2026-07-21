@@ -495,6 +495,13 @@
                 />
                 <button type="submit" id="submit-btn">Consultar</button>
               </div>
+              <div
+                class="cf-turnstile"
+                data-sitekey="0x4AAAAAAD6qnlMFVrva6A__"
+                data-action="order_lookup"
+                data-theme="dark"
+                data-size="flexible"
+              ></div>
             </form>
           </div>
 
@@ -513,23 +520,8 @@
       </div>
     </main>
 
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-      import {
-        getFirestore,
-        doc,
-        getDoc,
-      } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-
-      const firebaseConfig = {
-        apiKey: "AIzaSyDVNn84jMtB9INNXvD8QfJ8sIJqJXlruGQ",
-        authDomain: "jmfix-pag.firebaseapp.com",
-        projectId: "jmfix-pag",
-        storageBucket: "jmfix-pag.firebasestorage.app",
-        messagingSenderId: "589641823028",
-        appId: "1:589641823028:web:9a692707d7f5da424bab61",
-      };
-      const db = getFirestore(initializeApp(firebaseConfig));
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" defer></script>
+    <script>
 
       const ESTADOS = {
         ingresado: { label: "Ingresado", color: "#9aa2ad" },
@@ -582,19 +574,25 @@
         submitBtn.disabled = true;
 
         try {
-          const snapshot = await getDoc(doc(db, "publicOrders", numero));
+          const turnstileToken = document.querySelector(
+            '[name="cf-turnstile-response"]',
+          )?.value;
+          const response = await fetch("/.netlify/functions/lookup-order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ numero, turnstileToken }),
+          });
+          const payload = await response.json();
           loadingMsg.classList.remove("show");
           submitBtn.disabled = false;
 
-          if (!snapshot.exists()) {
-            errorMsg.textContent =
-              "No encontramos ninguna orden con ese número.";
+          if (!response.ok) {
+            errorMsg.textContent = payload.error || "No pudimos realizar la búsqueda.";
             errorMsg.classList.add("show");
             return;
           }
-          const data = snapshot.data();
 
-          renderResult(data);
+          renderResult(payload.order);
           perforation.style.display = "block";
           result.classList.add("show");
         } catch (err) {
@@ -603,6 +601,8 @@
           errorMsg.textContent =
             "Hubo un problema de conexión. Probá de nuevo en un momento.";
           errorMsg.classList.add("show");
+        } finally {
+          window.turnstile?.reset();
         }
       });
 

@@ -7,9 +7,7 @@ service cloud.firestore {
     }
 
     match /publicOrders/{numero} {
-      allow get: if true;
-      allow list: if false;
-      allow create, update, delete: if isAdmin();
+      allow read, write: if isAdmin();
     }
     match /orders/{numero} { allow read, write: if isAdmin(); }
     match /clients/{clientId} { allow read, write: if isAdmin(); }
