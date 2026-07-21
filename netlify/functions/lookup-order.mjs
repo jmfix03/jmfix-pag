@@ -13,12 +13,15 @@ function firebaseDb() {
   return getFirestore(app);
 }
 
-function clientIp(headers) {
-  return headers["x-nf-client-connection-ip"] || headers["X-Nf-Client-Connection-Ip"] || headers["x-forwarded-for"]?.split(",")[0]?.trim() || "unknown";
+function clientIp(request) {
+  return request.headers.get("x-nf-client-connection-ip") || request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
 }
 
-function response(statusCode, body) {
-  return { statusCode, headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" }, body: JSON.stringify(body) };
+function response(status, body) {
+  return Response.json(body, {
+    status,
+    headers: { "Cache-Control": "no-store" },
+  });
 }
 
 async function verifyTurnstile(token, ip) {
@@ -68,13 +71,14 @@ function publicOrder(data) {
   };
 }
 
-export default async (event) => {
-  if (event.httpMethod !== "POST") return response(405, { error: "Método no permitido." });
+export default async (request) => {
+  if (request.method !== "POST") return response(405, { error: "Método no permitido." });
   if (!process.env.TURNSTILE_SECRET_KEY || !process.env.FIREBASE_SERVICE_ACCOUNT_JSON) return response(500, { error: "La búsqueda segura no está configurada." });
   let input;
   try {
-    if (!event.body || event.body.length > 1000) throw new Error();
-    input = JSON.parse(event.body);
+    const body = await request.text();
+    if (!body || body.length > 1000) throw new Error();
+    input = JSON.parse(body);
   } catch {
     return response(400, { error: "Solicitud inválida." });
   }
@@ -82,7 +86,7 @@ export default async (event) => {
   const token = String(input.turnstileToken || "").trim();
   if (!/^\d{1,10}$/.test(numero) || !token) return response(400, { error: "Completá la verificación e ingresá un número de orden válido." });
 
-  const ip = clientIp(event.headers || {});
+  const ip = clientIp(request);
   try {
     if (!(await verifyTurnstile(token, ip))) return response(403, { error: "No se pudo validar la verificación. Intentá nuevamente." });
     if (!(await consumeLookup(ip)).allowed) return response(429, { error: "Alcanzaste el máximo de 5 búsquedas por hora. Probá más tarde." });
