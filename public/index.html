@@ -285,7 +285,7 @@
   <div class="wrap">
     <p class="eyebrow">Estado de tu equipo</p>
     <h1>Ingresá tu número de orden</h1>
-    <p class="lead">Es el número que te dimos cuando dejaste tu equipo. Vas a ver el estado, el presupuesto y cuánto te falta abonar, y podés descargarlo en PDF.</p>
+    <p class="lead">Es el número que te dimos cuando dejaste tu equipo. Vas a ver el estado, el detalle y cuánto te falta abonar, además podés descargarlo en PDF.</p>
 
     <section class="ticket" id="ticket">
       <div class="stub">
@@ -411,10 +411,6 @@ function renderResult(o){
         <p class="field-value">${o.detalleDiagnostico || "Todavía no cargamos el diagnóstico."}</p>
       </div>
       <div class="field">
-        <p class="field-label">Presupuesto</p>
-        <p class="field-value amount">${o.presupuesto != null ? money(o.presupuesto) : "—"}</p>
-      </div>
-      <div class="field">
         <p class="field-label">Garantía</p>
         <p class="field-value mono">${o.garantia || "—"}</p>
       </div>
@@ -488,7 +484,6 @@ async function generatePdf(o, opts){
   doc.text(diag, 15, y);
   y += diag.length * 6 + 6;
 
-  line("Presupuesto:", o.presupuesto != null ? money(o.presupuesto) : "—");
   line("Garantía:", o.garantia || "—");
   line("Total:", o.total != null ? money(o.total) : "—");
   line("Pagado:", o.pagado != null ? money(o.pagado) : "—");

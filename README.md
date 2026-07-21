@@ -29,6 +29,7 @@ El proyecto ya está configurado en los HTML como jmfix-pag.
         match /orders/{numero} { allow read, write: if request.auth != null; }
         match /clients/{clientId} { allow read, write: if request.auth != null; }
         match /equipmentTypes/{id} { allow read, write: if request.auth != null; }
+        match /equipmentModels/{id} { allow read, write: if request.auth != null; }
         match /colors/{id} { allow read, write: if request.auth != null; }
         match /accessoryOptions/{id} { allow read, write: if request.auth != null; }
         match /counters/{id} { allow read, write: if request.auth != null; }
@@ -40,9 +41,10 @@ Si agregás más usuarios autenticados, también podrán administrar el contenid
 ## Modelo de datos
 
 - orders/{numero}: ficha privada completa, incluido clientId, equipo, color y accesorios.
-- publicOrders/{numero}: copia pública sin datos de cliente. Incluye número, fecha, estado, diagnóstico, presupuesto, garantía, total, pagado y saldo.
+- publicOrders/{numero}: copia pública sin datos de cliente. Incluye número, fecha, estado, diagnóstico, garantía, total, pagado y saldo.
 - clients/{id}: nombre, apellido, DNI y teléfono opcional.
-- equipmentTypes, colors y accessoryOptions: opciones administrables desde el panel.
+- equipmentTypes, equipmentModels, colors y accessoryOptions: opciones administrables desde el panel.
+- orders/{numero} también puede incluir modelId y repuestos (privados): descripción, dónde se compró, valor, garantía y fecha.
 - counters/orderNumber: contador de órdenes. La primera orden creada recibe el número 100.
 
 Al crear o modificar una orden, el panel escribe a la vez la ficha privada y la copia pública.
@@ -51,7 +53,7 @@ Al crear o modificar una orden, el panel escribe a la vez la ficha privada y la 
 
 Entrá a /admin.html e iniciá sesión. En una nueva orden elegís o creás un cliente, cargás el equipo, color, descripción, accesorios y estado. Al guardar, Firestore asigna el número en una transacción y la fecha de ingreso se genera automáticamente.
 
-Desde la tabla podés editar la ficha en cualquier momento o abrir Presupuesto para cargar diagnóstico, presupuesto, garantía, total y pagos. El saldo se calcula automáticamente.
+Desde la tabla podés editar la ficha en cualquier momento o abrir Presupuesto para cargar diagnóstico, garantía, total y pagos. El saldo se calcula automáticamente. La sección Caja mensual calcula ingresos por fecha de ingreso y gasto de repuestos por su fecha.
 
 ## Publicar en Netlify
 
