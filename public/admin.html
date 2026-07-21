@@ -187,6 +187,10 @@
       #app {
         display: none;
       }
+      #app[hidden],
+      .panel-view[hidden] {
+        display: none !important;
+      }
       body:not(.authenticated) > .sidebar,
       body:not(.authenticated) > header,
       body:not(.authenticated) #app,
@@ -1728,6 +1732,9 @@
           clients: clientView,
           equipment: equipmentView,
         };
+        document
+          .querySelectorAll(".panel-view")
+          .forEach((panel) => (panel.hidden = true));
         Object.entries(panels).forEach(([name, panel]) => {
           panel.hidden = name !== view;
         });
