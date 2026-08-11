@@ -725,6 +725,15 @@
             (c) =>
               ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c],
           );
+      const equipmentLabel = (o) => {
+        const type = opts.equipmentTypes.find(
+            (x) => x.id === o.equipmentTypeId,
+          )?.nombre,
+          color = opts.colors.find((x) => x.id === o.color)?.nombre,
+          model = opts.equipmentModels?.find((x) => x.id === o.modelId)
+            ?.nombre;
+        return [type, color, model].filter(Boolean).join(" - ") || "—";
+      };
       let pdfLogo;
       async function getPdfLogo() {
         if (pdfLogo) return pdfLogo;
@@ -884,11 +893,8 @@
       function table() {
         const t = $("search").value.toLowerCase(),
           a = orders.filter((o) => {
-            const c = clients.find((x) => x.id === o.clientId) || {},
-              e =
-                opts.equipmentTypes.find((x) => x.id === o.equipmentTypeId) ||
-                {};
-            return [o.numero, c.nombre, c.apellido, c.dni, e.nombre]
+            const c = clients.find((x) => x.id === o.clientId) || {};
+            return [o.numero, c.nombre, c.apellido, c.dni, equipmentLabel(o)]
               .join(" ")
               .toLowerCase()
               .includes(t);
@@ -899,11 +905,7 @@
           ? "<table><thead><tr><th>N.º</th><th>Ingreso</th><th>Cliente</th><th>Equipo</th><th>Estado</th><th>Saldo</th><th></th></tr></thead><tbody>" +
             a
               .map((o) => {
-                const c = clients.find((x) => x.id === o.clientId) || {},
-                  e =
-                    opts.equipmentTypes.find(
-                      (x) => x.id === o.equipmentTypeId,
-                    ) || {};
+                const c = clients.find((x) => x.id === o.clientId) || {};
                 return (
                   "<tr><td>" +
                   o.numero +
@@ -912,7 +914,7 @@
                   "</td><td>" +
                   safe((c.nombre || "") + " " + (c.apellido || "")) +
                   "</td><td>" +
-                  safe(e.nombre || "—") +
+                  safe(equipmentLabel(o)) +
                   "</td><td>" +
                   safe(names[o.estado] || o.estado || "—") +
                   "</td><td>" +
@@ -1661,13 +1663,10 @@
         const term = $("ordersSearch").value.trim().toLowerCase(),
           status = $("ordersStatus").value,
           rows = orders.filter((o) => {
-            const c = clients.find((x) => x.id === o.clientId) || {},
-              e =
-                opts.equipmentTypes.find((x) => x.id === o.equipmentTypeId) ||
-                {};
+            const c = clients.find((x) => x.id === o.clientId) || {};
             return (
               (!status || o.estado === status) &&
-              [o.numero, c.nombre, c.apellido, c.dni, e.nombre]
+              [o.numero, c.nombre, c.apellido, c.dni, equipmentLabel(o)]
                 .join(" ")
                 .toLowerCase()
                 .includes(term)
@@ -1677,11 +1676,7 @@
           ? "<table><thead><tr><th>N.º</th><th>Ingreso</th><th>Cliente</th><th>Equipo</th><th>Estado</th><th>Saldo</th><th></th></tr></thead><tbody>" +
             rows
               .map((o) => {
-                const c = clients.find((x) => x.id === o.clientId) || {},
-                  e =
-                    opts.equipmentTypes.find(
-                      (x) => x.id === o.equipmentTypeId,
-                    ) || {};
+                const c = clients.find((x) => x.id === o.clientId) || {};
                 return (
                   "<tr><td>" +
                   o.numero +
@@ -1690,7 +1685,7 @@
                   "</td><td>" +
                   safe((c.nombre || "") + " " + (c.apellido || "")) +
                   "</td><td>" +
-                  safe(e.nombre || "—") +
+                  safe(equipmentLabel(o)) +
                   "</td><td>" +
                   safe(names[o.estado] || o.estado) +
                   "</td><td>" +
@@ -1846,18 +1841,14 @@
           ? "<table><thead><tr><th>N.º</th><th>Cliente</th><th>Equipo</th><th>Estado</th><th>Saldo</th></tr></thead><tbody>" +
             active
               .map((o) => {
-                const c = clients.find((x) => x.id === o.clientId) || {},
-                  e =
-                    opts.equipmentTypes.find(
-                      (x) => x.id === o.equipmentTypeId,
-                    ) || {};
+                const c = clients.find((x) => x.id === o.clientId) || {};
                 return (
                   "<tr><td>" +
                   o.numero +
                   "</td><td>" +
                   safe((c.nombre || "") + " " + (c.apellido || "")) +
                   "</td><td>" +
-                  safe(e.nombre || "—") +
+                  safe(equipmentLabel(o)) +
                   "</td><td>" +
                   safe(names[o.estado] || o.estado) +
                   "</td><td>" +
