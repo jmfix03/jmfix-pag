@@ -734,6 +734,16 @@
             ?.nombre;
         return [type, color, model].filter(Boolean).join(" - ") || "—";
       };
+      const deviceDetails = (o) => ({
+        type: opts.equipmentTypes.find((x) => x.id === o.equipmentTypeId)
+          ?.nombre,
+        model: opts.equipmentModels?.find((x) => x.id === o.modelId)?.nombre,
+        color: opts.colors.find((x) => x.id === o.color)?.nombre,
+        accessories: (o.accesorios || [])
+          .map((id) => opts.accessoryOptions.find((x) => x.id === id)?.nombre)
+          .filter(Boolean)
+          .join(", "),
+      });
       let pdfLogo;
       async function getPdfLogo() {
         if (pdfLogo) return pdfLogo;
@@ -786,6 +796,11 @@
         );
         line("DNI:", customer.dni);
         line("Estado:", names[o.estado] || o.estado);
+        const device = deviceDetails(o);
+        line("Tipo de equipo:", device.type);
+        line("Modelo:", device.model);
+        line("Color:", device.color);
+        line("Accesorios:", device.accessories);
         y += 2;
         pdf.setFont("helvetica", "bold");
         pdf.text("Detalle del diagnóstico:", 15, y);
@@ -1427,7 +1442,11 @@
                   safe(c.dni) +
                   "</td><td>" +
                   safe(c.telefono || "—") +
-                  '</td><td class="actions"><button class="danger small" data-client-delete="' +
+                  '</td><td class="actions"><button class="secondary small" data-client-orders="' +
+                  c.id +
+                  '">Ver órdenes</button><button class="secondary small" data-client-edit="' +
+                  c.id +
+                  '">Editar</button><button class="danger small" data-client-delete="' +
                   c.id +
                   '">Borrar</button></td></tr>',
               )
@@ -1555,10 +1574,15 @@
       const finalSave = async (o) => {
         delete o.presupuesto;
         delete o.descripcionEquipo;
+        const device = deviceDetails(o);
         const p = {
           numero: o.numero,
           fechaIngreso: o.fechaIngreso,
           estado: o.estado,
+          tipoEquipo: device.type || "",
+          modeloEquipo: device.model || "",
+          colorEquipo: device.color || "",
+          accesorios: device.accessories || "",
           detalleDiagnostico: o.detalleDiagnostico || "",
           garantia: o.garantia || "",
           total: o.total ?? null,
@@ -1594,10 +1618,15 @@
             };
           })
           .filter((x) => x.descripcion);
+        const device = deviceDetails(o);
         const p = {
           numero: o.numero,
           fechaIngreso: o.fechaIngreso,
           estado: o.estado,
+          tipoEquipo: device.type || "",
+          modeloEquipo: device.model || "",
+          colorEquipo: device.color || "",
+          accesorios: device.accessories || "",
           detalleDiagnostico: o.detalleDiagnostico || "",
           garantia: o.garantia || "",
           total: o.total ?? null,
