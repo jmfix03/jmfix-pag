@@ -726,19 +726,24 @@
               ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c],
           );
       const equipmentLabel = (o) => {
-        const type = opts.equipmentTypes.find(
-            (x) => x.id === o.equipmentTypeId,
-          )?.nombre,
-          color = opts.colors.find((x) => x.id === o.color)?.nombre,
-          model = opts.equipmentModels?.find((x) => x.id === o.modelId)
-            ?.nombre;
-        return [type, color, model].filter(Boolean).join(" - ") || "—";
+        const device = deviceDetails(o);
+        return [
+          device.type,
+          device.model && "Modelo: " + device.model,
+          device.color && "Color: " + device.color,
+        ]
+          .filter(Boolean)
+          .join(" · ") || "—";
       };
       const deviceDetails = (o) => ({
-        type: opts.equipmentTypes.find((x) => x.id === o.equipmentTypeId)
-          ?.nombre,
-        model: opts.equipmentModels?.find((x) => x.id === o.modelId)?.nombre,
-        color: opts.colors.find((x) => x.id === o.color)?.nombre,
+        type:
+          opts.equipmentTypes.find((x) => x.id === o.equipmentTypeId)
+            ?.nombre || o.equipmentType || "",
+        model:
+          opts.equipmentModels?.find((x) => x.id === o.modelId)?.nombre ||
+          o.modelo ||
+          "",
+        color: opts.colors.find((x) => x.id === o.color)?.nombre || o.colorNombre || "",
         accessories: (o.accesorios || [])
           .map((id) => opts.accessoryOptions.find((x) => x.id === id)?.nombre)
           .filter(Boolean)
@@ -1136,8 +1141,8 @@
             ].map((x) => x.value),
             estado: $("status").value,
           };
-          if (!b.equipmentTypeId || !b.color)
-            throw Error("Elegí tipo de equipo y color.");
+          if (!b.equipmentTypeId || !b.color || !$("model")?.value)
+            throw Error("Elegí tipo de equipo, modelo y color.");
           let n = $("editNumber").value,
             o;
           if (n)
@@ -1300,6 +1305,8 @@
                   "</option>",
               )
               .join("");
+        table();
+        if (!ordersView.hidden) renderOrdersOnly();
       };
       document.getElementById("description")?.closest(".field")?.remove();
       document.getElementById("quote")?.closest(".field")?.remove();
