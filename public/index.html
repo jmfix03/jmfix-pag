@@ -697,47 +697,79 @@
         doc.setTextColor(245, 255, 247);
         doc.setFont("helvetica", "normal");
         doc.setFontSize(10);
-        doc.text("Detalle de orden de reparación", 42, 24);
+        doc.text("Comprobante de reparación", 42, 24);
 
         doc.setTextColor(20, 23, 28);
         let y = 44;
-        const line = (label, value) => {
+        const ensureSpace = (height) => {
+          if (y + height <= 280) return;
+          doc.addPage();
+          y = 20;
+        };
+        const section = (title) => {
+          ensureSpace(12);
           doc.setFont("helvetica", "bold");
           doc.setFontSize(11);
+          doc.setTextColor(0, 125, 71);
+          doc.text(title, 15, y);
+          doc.setTextColor(20, 23, 28);
+          y += 7;
+        };
+        const divider = () => {
+          ensureSpace(10);
+          doc.setDrawColor(210);
+          doc.line(15, y, 195, y);
+          y += 8;
+        };
+        const line = (label, value) => {
+          const values = doc.splitTextToSize(
+            String(value != null && value !== "" ? value : "—"),
+            120,
+          );
+          ensureSpace(Math.max(9, values.length * 5 + 4));
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(10);
           doc.text(label, 15, y);
           doc.setFont("helvetica", "normal");
-          doc.text(String(value != null && value !== "" ? value : "—"), 70, y);
-          y += 9;
+          doc.text(values, 70, y);
+          y += Math.max(9, values.length * 5 + 4);
         };
 
-        doc.setFontSize(14);
-        doc.setFont("helvetica", "bold");
-        doc.text(`Orden N.º ${o.numero}`, 15, y);
-        y += 10;
-
+        section("ORDEN Y CLIENTE");
+        line("Orden N.º:", o.numero);
         line("Fecha de ingreso:", fmtDate(o.fechaIngreso));
         line("Estado:", estado.label);
+        line("Cliente:", o.cliente);
+        divider();
+
+        section("DATOS DEL EQUIPO");
         line("Tipo de equipo:", o.tipoEquipo);
         line("Modelo:", o.modeloEquipo);
         line("Color:", o.colorEquipo);
         line("Accesorios:", o.accesorios);
-        y += 2;
-        doc.setFont("helvetica", "bold");
-        doc.text("Detalle del diagnóstico:", 15, y);
-        y += 7;
+        divider();
+
+        section("DIAGNÓSTICO Y TRABAJO A REALIZAR");
         doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
         const diag = doc.splitTextToSize(
           o.detalleDiagnostico || "Sin diagnóstico cargado.",
           180,
         );
+        ensureSpace(diag.length * 5 + 5);
         doc.text(diag, 15, y);
-        y += diag.length * 6 + 6;
+        y += diag.length * 5 + 6;
+        divider();
 
-        line("Garantía:", o.garantia || "—");
-        line("Total:", o.total != null ? money(o.total) : "—");
-        line("Pagado:", o.pagado != null ? money(o.pagado) : "—");
+        section("RESUMEN ECONÓMICO Y GARANTÍA");
+        line("Garantía aplicada:", o.garantia || "60 días");
+        line("Total presupuestado:", o.total != null ? money(o.total) : "—");
+        line("Total abonado:", o.pagado != null ? money(o.pagado) : "—");
+        line("Total restante:", saldo > 0 ? money(saldo) : "—");
 
+        ensureSpace(10);
         doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
         doc.setTextColor(
           saldo > 0 ? 200 : 20,
           saldo > 0 ? 100 : 130,
@@ -748,8 +780,27 @@
           15,
           y,
         );
+        y += 11;
+        divider();
 
-        y += 16;
+        section("CONDICIONES DE GARANTÍA");
+        const conditions = [
+          "Todas las reparaciones cuentan con 60 días de garantía, salvo que se indique expresamente lo contrario.",
+          "La garantía cubre la reparación realizada y la falla asociada al trabajo efectuado.",
+          "La garantía no cubre nuevas fallas o daños distintos a los reparados.",
+          "Los equipos mojados o con daño por líquidos quedan exceptuados de la garantía.",
+          "La garantía queda sujeta a la evaluación del equipo para determinar si el inconveniente corresponde a la reparación realizada.",
+          "La garantía no implica cobertura sobre daños ocasionados posteriormente por el uso, golpes, líquidos u otras causas ajenas a la reparación.",
+        ];
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        conditions.forEach((condition) => {
+          const text = doc.splitTextToSize("• " + condition, 176);
+          ensureSpace(text.length * 4 + 3);
+          doc.text(text, 17, y);
+          y += text.length * 4 + 3;
+        });
+        ensureSpace(12);
         doc.setDrawColor(200);
         doc.line(15, y, 195, y);
         y += 8;

@@ -63,6 +63,7 @@ function publicOrder(data) {
     numero: data.numero,
     fechaIngreso: date ? date.toISOString().slice(0, 10) : null,
     estado: data.estado || "",
+    cliente: data.cliente || "",
     tipoEquipo: data.tipoEquipo || "",
     modeloEquipo: data.modeloEquipo || "",
     colorEquipo: data.colorEquipo || "",

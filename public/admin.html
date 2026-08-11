@@ -779,48 +779,84 @@
         pdf.setTextColor(245, 255, 247);
         pdf.setFont("helvetica", "normal");
         pdf.setFontSize(10);
-        pdf.text("Detalle de orden de reparación", 42, 24);
+        pdf.text("Comprobante de reparación", 42, 24);
         pdf.setTextColor(20, 23, 28);
         let y = 44;
-        const line = (label, value) => {
+        const ensureSpace = (height) => {
+          if (y + height <= 280) return;
+          pdf.addPage();
+          y = 20;
+        };
+        const section = (title) => {
+          ensureSpace(12);
           pdf.setFont("helvetica", "bold");
           pdf.setFontSize(11);
+          pdf.setTextColor(0, 125, 71);
+          pdf.text(title, 15, y);
+          pdf.setTextColor(20, 23, 28);
+          y += 7;
+        };
+        const divider = () => {
+          ensureSpace(10);
+          pdf.setDrawColor(210);
+          pdf.line(15, y, 195, y);
+          y += 8;
+        };
+        const line = (label, value) => {
+          const values = pdf.splitTextToSize(
+            String(value != null && value !== "" ? value : "—"),
+            120,
+          );
+          ensureSpace(Math.max(9, values.length * 5 + 4));
+          pdf.setFont("helvetica", "bold");
+          pdf.setFontSize(10);
           pdf.text(label, 15, y);
           pdf.setFont("helvetica", "normal");
-          pdf.text(String(value != null && value !== "" ? value : "—"), 70, y);
-          y += 9;
+          pdf.text(values, 70, y);
+          y += Math.max(9, values.length * 5 + 4);
         };
-        pdf.setFontSize(14);
-        pdf.setFont("helvetica", "bold");
-        pdf.text("Orden N.º " + o.numero, 15, y);
-        y += 10;
+
+        section("ORDEN Y CLIENTE");
+        line("Orden N.º:", o.numero);
         line("Fecha de ingreso:", date(o.fechaIngreso));
+        line("Estado:", names[o.estado] || o.estado);
         line(
           "Cliente:",
           [customer.nombre, customer.apellido].filter(Boolean).join(" "),
         );
         line("DNI:", customer.dni);
-        line("Estado:", names[o.estado] || o.estado);
+        line("Teléfono:", customer.telefono);
+        divider();
+
+        section("DATOS DEL EQUIPO");
         const device = deviceDetails(o);
         line("Tipo de equipo:", device.type);
         line("Modelo:", device.model);
         line("Color:", device.color);
         line("Accesorios:", device.accessories);
-        y += 2;
-        pdf.setFont("helvetica", "bold");
-        pdf.text("Detalle del diagnóstico:", 15, y);
-        y += 7;
+        divider();
+
+        section("DIAGNÓSTICO Y TRABAJO A REALIZAR");
         pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(10);
         const detail = pdf.splitTextToSize(
           o.detalleDiagnostico || "Todavía no cargamos el diagnóstico.",
           180,
         );
+        ensureSpace(detail.length * 5 + 5);
         pdf.text(detail, 15, y);
-        y += detail.length * 6 + 6;
-        line("Garantía:", o.garantia);
-        line("Total:", o.total == null ? "—" : money(o.total));
-        line("Pagado:", money(o.pagado));
+        y += detail.length * 5 + 6;
+        if (o.presupuesto != null) line("Presupuesto:", money(o.presupuesto));
+        divider();
+
+        section("RESUMEN ECONÓMICO Y GARANTÍA");
+        line("Garantía aplicada:", o.garantia || "60 días");
+        line("Total presupuestado:", o.total == null ? "—" : money(o.total));
+        line("Total abonado:", money(o.pagado));
+        line("Total restante:", saldo > 0 ? money(saldo) : "—");
+        ensureSpace(10);
         pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(11);
         pdf.setTextColor(
           saldo > 0 ? 200 : 20,
           saldo > 0 ? 100 : 130,
@@ -832,7 +868,27 @@
           15,
           y,
         );
-        y += 16;
+        y += 11;
+        divider();
+
+        section("CONDICIONES DE GARANTÍA");
+        const conditions = [
+          "Todas las reparaciones cuentan con 60 días de garantía, salvo que se indique expresamente lo contrario.",
+          "La garantía cubre la reparación realizada y la falla asociada al trabajo efectuado.",
+          "La garantía no cubre nuevas fallas o daños distintos a los reparados.",
+          "Los equipos mojados o con daño por líquidos quedan exceptuados de la garantía.",
+          "La garantía queda sujeta a la evaluación del equipo para determinar si el inconveniente corresponde a la reparación realizada.",
+          "La garantía no implica cobertura sobre daños ocasionados posteriormente por el uso, golpes, líquidos u otras causas ajenas a la reparación.",
+        ];
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(8);
+        conditions.forEach((condition) => {
+          const text = pdf.splitTextToSize("• " + condition, 176);
+          ensureSpace(text.length * 4 + 3);
+          pdf.text(text, 17, y);
+          y += text.length * 4 + 3;
+        });
+        ensureSpace(12);
         pdf.setDrawColor(200);
         pdf.line(15, y, 195, y);
         y += 8;
@@ -1582,10 +1638,12 @@
         delete o.presupuesto;
         delete o.descripcionEquipo;
         const device = deviceDetails(o);
+        const customer = clients.find((c) => c.id === o.clientId) || {};
         const p = {
           numero: o.numero,
           fechaIngreso: o.fechaIngreso,
           estado: o.estado,
+          cliente: [customer.nombre, customer.apellido].filter(Boolean).join(" "),
           tipoEquipo: device.type || "",
           modeloEquipo: device.model || "",
           colorEquipo: device.color || "",
@@ -1626,10 +1684,12 @@
           })
           .filter((x) => x.descripcion);
         const device = deviceDetails(o);
+        const customer = clients.find((c) => c.id === o.clientId) || {};
         const p = {
           numero: o.numero,
           fechaIngreso: o.fechaIngreso,
           estado: o.estado,
+          cliente: [customer.nombre, customer.apellido].filter(Boolean).join(" "),
           tipoEquipo: device.type || "",
           modeloEquipo: device.model || "",
           colorEquipo: device.color || "",
