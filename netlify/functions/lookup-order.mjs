@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
 
-const MAX_LOOKUPS = 5;
+const MAX_LOOKUPS = 10;
 const WINDOW_MS = 60 * 60 * 1000;
 const MAX_TOKEN_LENGTH = 4096;
 
