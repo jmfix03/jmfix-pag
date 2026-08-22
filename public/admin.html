@@ -680,6 +680,7 @@
         addDoc,
         setDoc,
         deleteDoc,
+        writeBatch,
         query,
         orderBy,
         runTransaction,
@@ -1209,6 +1210,7 @@
           const b = {
             clientId: id,
             equipmentTypeId: $("equipment").value,
+            modelId: $("model").value,
             color: $("color").value,
             descripcionEquipo: $("description").value.trim(),
             accesorios: [
@@ -1435,7 +1437,6 @@
       save = async (o) => {
         delete o.presupuesto;
         delete o.descripcionEquipo;
-        o.modelId = $("model")?.value || "";
         o.repuestos = [...document.querySelectorAll(".spare")]
           .map((row) => {
             const x = row.querySelectorAll("input");
@@ -1689,7 +1690,6 @@
       save = async (o) => {
         delete o.presupuesto;
         delete o.descripcionEquipo;
-        o.modelId = $("model")?.value || o.modelId || "";
         o.repuestos = [...document.querySelectorAll(".spare")]
           .map((row) => {
             const x = row.querySelectorAll("input");
@@ -1719,10 +1719,10 @@
           pagado: o.pagado ?? 0,
           saldo: (Number(o.total) || 0) - (Number(o.pagado) || 0),
         };
-        await Promise.all([
-          setDoc(doc(db, "orders", String(o.numero)), o),
-          setDoc(doc(db, "publicOrders", String(o.numero)), p),
-        ]);
+        const batch = writeBatch(db);
+        batch.set(doc(db, "orders", String(o.numero)), o);
+        batch.set(doc(db, "publicOrders", String(o.numero)), p);
+        await batch.commit();
         toast("Orden guardada correctamente");
       };
       /* Keep spare parts strictly inside the private budget workflow. */
