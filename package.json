@@ -4,7 +4,8 @@
   "private": true,
   "description": "Portal de seguimiento de órdenes de reparación para JM Fix",
   "scripts": {
-    "grant-admin": "node scripts/grant-admin.mjs"
+    "grant-admin": "node scripts/grant-admin.mjs",
+    "serve": "node scripts/serve.mjs"
   },
   "dependencies": {
     "firebase-admin": "^14.2.0"

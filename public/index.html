@@ -734,19 +734,36 @@
           doc.text(values, 70, y);
           y += Math.max(9, values.length * 5 + 4);
         };
+        const pair = (leftLabel, leftValue, rightLabel, rightValue) => {
+          const left = doc.splitTextToSize(
+            String(leftValue != null && leftValue !== "" ? leftValue : "—"),
+            54,
+          );
+          const right = doc.splitTextToSize(
+            String(rightValue != null && rightValue !== "" ? rightValue : "—"),
+            54,
+          );
+          const height = Math.max(left.length, right.length) * 4 + 7;
+          ensureSpace(height);
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(8);
+          doc.text(leftLabel, 15, y);
+          doc.text(rightLabel, 108, y);
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(9);
+          doc.text(left, 15, y + 4);
+          doc.text(right, 108, y + 4);
+          y += height;
+        };
 
         section("ORDEN Y CLIENTE");
-        line("Orden N.º:", o.numero);
-        line("Fecha de ingreso:", fmtDate(o.fechaIngreso));
-        line("Estado:", estado.label);
-        line("Cliente:", o.cliente);
+        pair("Orden N.º", o.numero, "Fecha de ingreso", fmtDate(o.fechaIngreso));
+        pair("Estado", estado.label, "Cliente", o.cliente);
         divider();
 
         section("DATOS DEL EQUIPO");
-        line("Tipo de equipo:", o.tipoEquipo);
-        line("Modelo:", o.modeloEquipo);
-        line("Color:", o.colorEquipo);
-        line("Accesorios:", o.accesorios);
+        pair("Tipo de equipo", o.tipoEquipo, "Modelo", o.modeloEquipo);
+        pair("Color", o.colorEquipo, "Accesorios", o.accesorios);
         divider();
 
         section("DIAGNÓSTICO Y TRABAJO A REALIZAR");
@@ -762,10 +779,8 @@
         divider();
 
         section("RESUMEN ECONÓMICO Y GARANTÍA");
-        line("Garantía aplicada:", o.garantia || "60 días");
-        line("Total presupuestado:", o.total != null ? money(o.total) : "—");
-        line("Total abonado:", o.pagado != null ? money(o.pagado) : "—");
-        line("Total restante:", saldo > 0 ? money(saldo) : "—");
+        pair("Garantía aplicada", o.garantia || "60 días", "Total presupuestado", o.total != null ? money(o.total) : "—");
+        pair("Total abonado", o.pagado != null ? money(o.pagado) : "—", "Total restante", saldo > 0 ? money(saldo) : "—");
 
         ensureSpace(10);
         doc.setFont("helvetica", "bold");
@@ -793,13 +808,16 @@
           "La garantía no implica cobertura sobre daños ocasionados posteriormente por el uso, golpes, líquidos u otras causas ajenas a la reparación.",
         ];
         doc.setFont("helvetica", "normal");
-        doc.setFontSize(8);
-        conditions.forEach((condition) => {
-          const text = doc.splitTextToSize("• " + condition, 176);
-          ensureSpace(text.length * 4 + 3);
-          doc.text(text, 17, y);
-          y += text.length * 4 + 3;
-        });
+        doc.setFontSize(7);
+        for (let index = 0; index < conditions.length; index += 2) {
+          const left = doc.splitTextToSize("• " + conditions[index], 84);
+          const right = doc.splitTextToSize("• " + (conditions[index + 1] || ""), 84);
+          const height = Math.max(left.length, right.length) * 3.5 + 3;
+          ensureSpace(height);
+          doc.text(left, 15, y);
+          doc.text(right, 108, y);
+          y += height;
+        }
         ensureSpace(12);
         doc.setDrawColor(200);
         doc.line(15, y, 195, y);
