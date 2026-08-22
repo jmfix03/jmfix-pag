@@ -544,13 +544,18 @@
       const perforation = document.getElementById("perforation");
       const submitBtn = document.getElementById("submit-btn");
 
-      function money(n) {
-        const num = Number(n) || 0;
-        return num.toLocaleString("es-AR", {
-          style: "currency",
-          currency: "ARS",
-          maximumFractionDigits: 0,
-        });
+      function safe(value) {
+        return String(value ?? "").replace(
+          /[&<>"']/g,
+          (character) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[character],
+        );
       }
 
       function fmtDate(d) {
@@ -611,35 +616,23 @@
           label: o.estado || "—",
           color: "#9aa2ad",
         };
-        const saldo = Number(o.saldo);
-        const saldoClass = saldo > 0 ? "saldo-pend" : "saldo-ok";
-        const saldoText = saldo > 0 ? money(saldo) : "Sin saldo pendiente";
-
         result.innerHTML = `
     <div class="result-top">
-      <div class="order-number">N.º ${o.numero} <span>· ingresado ${fmtDate(o.fechaIngreso)}</span></div>
-      <span class="status-pill" style="border-color:${estado.color}55; color:${estado.color};">
-        <span class="dot" style="background:${estado.color}"></span>${estado.label}
+      <div class="order-number">N.º ${safe(o.numero)} <span>· ingresado ${safe(fmtDate(o.fechaIngreso))}</span></div>
+      <span class="status-pill" style="border-color:${safe(estado.color)}55; color:${safe(estado.color)};">
+        <span class="dot" style="background:${safe(estado.color)}"></span>${safe(estado.label)}
       </span>
     </div>
 
     <div class="grid">
-      ${o.dispositivo ? `<div class="field full"><p class="field-label">Equipo</p><p class="field-value">${o.dispositivo}</p></div>` : ""}
+      ${o.dispositivo ? `<div class="field full"><p class="field-label">Equipo</p><p class="field-value">${safe(o.dispositivo)}</p></div>` : ""}
       <div class="field full">
         <p class="field-label">Diagnóstico</p>
-        <p class="field-value">${o.detalleDiagnostico || "Todavía no cargamos el diagnóstico."}</p>
+        <p class="field-value">${safe(o.detalleDiagnostico || "Todavía no cargamos el diagnóstico.")}</p>
       </div>
       <div class="field">
         <p class="field-label">Garantía</p>
-        <p class="field-value mono">${o.garantia || "—"}</p>
-      </div>
-      <div class="field">
-        <p class="field-label">Total</p>
-        <p class="field-value amount">${o.total != null ? money(o.total) : "—"}</p>
-      </div>
-      <div class="field">
-        <p class="field-label">Saldo pendiente</p>
-        <p class="field-value amount ${saldoClass}">${saldoText}</p>
+        <p class="field-value mono">${safe(o.garantia || "—")}</p>
       </div>
     </div>
 
@@ -667,7 +660,7 @@
         modal.className = "pdf-confirm";
         modal.innerHTML =
           '<div><h2>¿Descargar comprobante?</h2><p>Se generará el PDF de la orden N.º ' +
-          o.numero +
+          safe(o.numero) +
           '.</p><button class="secondary">Cancelar</button><button>Descargar PDF</button></div>';
         modal.querySelector(".secondary").onclick = () => modal.remove();
         modal.querySelector("button:last-child").onclick = () => {
@@ -681,8 +674,6 @@
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         const estado = ESTADOS[o.estado] || { label: o.estado || "—" };
-        const saldo = Number(o.saldo);
-
         doc.setFillColor(0, 191, 99);
         doc.rect(0, 0, 210, 32, "F");
         doc.setFillColor(74, 161, 37);
@@ -758,12 +749,12 @@
 
         section("ORDEN Y CLIENTE");
         pair("Orden N.º", o.numero, "Fecha de ingreso", fmtDate(o.fechaIngreso));
-        pair("Estado", estado.label, "Cliente", o.cliente);
+        pair("Estado", estado.label, "Garantía", o.garantia || "60 días");
         divider();
 
         section("DATOS DEL EQUIPO");
         pair("Tipo de equipo", o.tipoEquipo, "Modelo", o.modeloEquipo);
-        pair("Color", o.colorEquipo, "Accesorios", o.accesorios);
+        pair("Color", o.colorEquipo, "", "");
         divider();
 
         section("DIAGNÓSTICO Y TRABAJO A REALIZAR");
@@ -778,23 +769,10 @@
         y += diag.length * 5 + 6;
         divider();
 
-        section("RESUMEN ECONÓMICO Y GARANTÍA");
-        pair("Garantía aplicada", o.garantia || "60 días", "Total presupuestado", o.total != null ? money(o.total) : "—");
-        pair("Total abonado", o.pagado != null ? money(o.pagado) : "—", "Total restante", saldo > 0 ? money(saldo) : "—");
-
-        ensureSpace(10);
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(11);
-        doc.setTextColor(
-          saldo > 0 ? 200 : 20,
-          saldo > 0 ? 100 : 130,
-          saldo > 0 ? 20 : 90,
-        );
-        doc.text(
-          `Saldo pendiente: ${saldo > 0 ? money(saldo) : "Sin saldo pendiente"}`,
-          15,
-          y,
-        );
+        section("GARANTÍA");
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        doc.text(o.garantia || "60 días", 15, y);
         y += 11;
         divider();
 

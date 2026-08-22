@@ -4,6 +4,7 @@ import { getFirestore, Timestamp } from "firebase-admin/firestore";
 
 const MAX_LOOKUPS = 5;
 const WINDOW_MS = 60 * 60 * 1000;
+const MAX_TOKEN_LENGTH = 4096;
 
 function firebaseDb() {
   const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
@@ -14,14 +15,27 @@ function firebaseDb() {
 }
 
 function clientIp(request) {
-  return request.headers.get("x-nf-client-connection-ip") || request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  return request.headers.get("x-nf-client-connection-ip") || "unknown";
 }
 
 function response(status, body) {
   return Response.json(body, {
     status,
-    headers: { "Cache-Control": "no-store" },
+    headers: {
+      "Cache-Control": "no-store, max-age=0",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "Referrer-Policy": "no-referrer",
+    },
   });
+}
+
+function allowedOrigin(request) {
+  const configured = (process.env.LOOKUP_ALLOWED_ORIGINS || "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+  return !configured.length || configured.includes(request.headers.get("origin"));
 }
 
 async function verifyTurnstile(token, ip) {
@@ -63,22 +77,18 @@ function publicOrder(data) {
     numero: data.numero,
     fechaIngreso: date ? date.toISOString().slice(0, 10) : null,
     estado: data.estado || "",
-    cliente: data.cliente || "",
     tipoEquipo: data.tipoEquipo || "",
     modeloEquipo: data.modeloEquipo || "",
     colorEquipo: data.colorEquipo || "",
-    accesorios: data.accesorios || "",
     detalleDiagnostico: data.detalleDiagnostico || "",
     garantia: data.garantia || "",
-    total: data.total ?? null,
-    pagado: data.pagado ?? 0,
-    saldo: data.saldo ?? 0,
   };
 }
 
 export default async (request) => {
   if (request.method !== "POST") return response(405, { error: "Método no permitido." });
   if (!process.env.TURNSTILE_SECRET_KEY || !process.env.FIREBASE_SERVICE_ACCOUNT_JSON) return response(500, { error: "La búsqueda segura no está configurada." });
+  if (!allowedOrigin(request)) return response(403, { error: "Solicitud no autorizada." });
   let input;
   try {
     const body = await request.text();
@@ -89,12 +99,12 @@ export default async (request) => {
   }
   const numero = String(input.numero || "").trim();
   const token = String(input.turnstileToken || "").trim();
-  if (!/^\d{1,10}$/.test(numero) || !token) return response(400, { error: "Completá la verificación e ingresá un número de orden válido." });
+  if (!/^\d{1,10}$/.test(numero) || !token || token.length > MAX_TOKEN_LENGTH) return response(400, { error: "Completá la verificación e ingresá un número de orden válido." });
 
   const ip = clientIp(request);
   try {
-    if (!(await verifyTurnstile(token, ip))) return response(403, { error: "No se pudo validar la verificación. Intentá nuevamente." });
     if (!(await consumeLookup(ip)).allowed) return response(429, { error: "Alcanzaste el máximo de 5 búsquedas por hora. Probá más tarde." });
+    if (!(await verifyTurnstile(token, ip))) return response(403, { error: "No se pudo validar la verificación. Intentá nuevamente." });
     const snapshot = await firebaseDb().collection("publicOrders").doc(numero).get();
     if (!snapshot.exists) return response(404, { error: "No encontramos ninguna orden con ese número." });
     return response(200, { order: publicOrder(snapshot.data()) });

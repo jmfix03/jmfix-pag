@@ -1312,23 +1312,29 @@
       };
       $("logout").onclick = () => signOut(auth);
       onAuthStateChanged(auth, async (u) => {
-        document.body.classList.toggle("authenticated", Boolean(u));
-        $("login").style.display = u ? "none" : "block";
-        $("app").style.display = u ? "block" : "none";
-        $("logout").hidden = !u;
-        if (!u) {
+        let isAdmin = false;
+        if (u) {
+          try {
+            isAdmin = (await u.getIdTokenResult()).claims.admin === true;
+          } catch (e) {}
+          if (!isAdmin) await signOut(auth);
+        }
+        document.body.classList.toggle("authenticated", isAdmin);
+        $("login").style.display = isAdmin ? "none" : "block";
+        $("app").style.display = isAdmin ? "block" : "none";
+        $("logout").hidden = !isAdmin;
+        if (!isAdmin) {
           document
             .querySelectorAll(".panel-view")
             .forEach((panel) => (panel.hidden = true));
           return;
         }
-        if (u)
-          try {
-            await data();
-          } catch (e) {
-            $("table").innerHTML =
-              '<div class="empty">No se pudieron cargar los datos. Verificá las reglas de Firestore.</div>';
-          }
+        try {
+          await data();
+        } catch (e) {
+          $("table").innerHTML =
+            '<div class="empty">No se pudieron cargar los datos. Verificá las reglas de Firestore.</div>';
+        }
       });
       const refreshDashboard = () => {
         if (!$("metricActive")) return;
