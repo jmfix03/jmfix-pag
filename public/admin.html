@@ -767,6 +767,8 @@
         const device = deviceDetails(o);
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF();
+        let logo = null;
+        try { logo = await getPdfLogo(); } catch (_) {}
         const approved = o.total !== null && o.total !== undefined && o.total !== "";
         const documentType = approved
           ? Number(o.pagado) > 0
@@ -775,7 +777,7 @@
           : "Presupuesto pendiente";
 
         JmFixPdf.create(pdf, {
-          logo: await getPdfLogo(),
+          logo,
           documentType,
           order: {
             numero: o.numero,
