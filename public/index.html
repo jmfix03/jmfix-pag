@@ -674,8 +674,10 @@
       async function generatePdf(o, opts) {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
+        let logo = null;
+        try { logo = await getPdfLogo(); } catch (_) {}
         JmFixPdf.create(doc, {
-          logo: await getPdfLogo(),
+          logo,
           documentType: "Detalle de reparación",
           order: {
             numero: o.numero,
