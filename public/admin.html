@@ -6,6 +6,7 @@
     <meta name="robots" content="noindex,nofollow" />
     <title>JM Fix · Admin</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="assets/pdf-layout.js"></script>
     <style>
       :root {
         --b: #14171c;
@@ -763,159 +764,36 @@
       }
       async function downloadOrderPdf(o) {
         const customer = clients.find((c) => c.id === o.clientId) || {};
+        const device = deviceDetails(o);
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF();
-        const saldo = (Number(o.total) || 0) - (Number(o.pagado) || 0);
-        pdf.setFillColor(0, 191, 99);
-        pdf.rect(0, 0, 210, 32, "F");
-        pdf.setFillColor(74, 161, 37);
-        pdf.triangle(95, 0, 210, 0, 210, 32, "F");
-        try {
-          pdf.addImage(await getPdfLogo(), "JPEG", 14, 5, 22, 22);
-        } catch (e) {}
-        pdf.setTextColor(255, 255, 255);
-        pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(20);
-        pdf.text("JM FIX", 42, 17);
-        pdf.setTextColor(245, 255, 247);
-        pdf.setFont("helvetica", "normal");
-        pdf.setFontSize(10);
-        pdf.text("Comprobante de reparación", 42, 24);
-        pdf.setTextColor(20, 23, 28);
-        let y = 44;
-        const ensureSpace = (height) => {
-          if (y + height <= 280) return;
-          pdf.addPage();
-          y = 20;
-        };
-        const section = (title) => {
-          ensureSpace(12);
-          pdf.setFont("helvetica", "bold");
-          pdf.setFontSize(11);
-          pdf.setTextColor(0, 125, 71);
-          pdf.text(title, 15, y);
-          pdf.setTextColor(20, 23, 28);
-          y += 7;
-        };
-        const divider = () => {
-          ensureSpace(10);
-          pdf.setDrawColor(210);
-          pdf.line(15, y, 195, y);
-          y += 8;
-        };
-        const line = (label, value) => {
-          const values = pdf.splitTextToSize(
-            String(value != null && value !== "" ? value : "—"),
-            120,
-          );
-          ensureSpace(Math.max(9, values.length * 5 + 4));
-          pdf.setFont("helvetica", "bold");
-          pdf.setFontSize(10);
-          pdf.text(label, 15, y);
-          pdf.setFont("helvetica", "normal");
-          pdf.text(values, 70, y);
-          y += Math.max(9, values.length * 5 + 4);
-        };
-        const pair = (leftLabel, leftValue, rightLabel, rightValue) => {
-          const left = pdf.splitTextToSize(
-            String(leftValue != null && leftValue !== "" ? leftValue : "—"),
-            54,
-          );
-          const right = pdf.splitTextToSize(
-            String(rightValue != null && rightValue !== "" ? rightValue : "—"),
-            54,
-          );
-          const height = Math.max(left.length, right.length) * 4 + 7;
-          ensureSpace(height);
-          pdf.setFont("helvetica", "bold");
-          pdf.setFontSize(8);
-          pdf.text(leftLabel, 15, y);
-          pdf.text(rightLabel, 108, y);
-          pdf.setFont("helvetica", "normal");
-          pdf.setFontSize(9);
-          pdf.text(left, 15, y + 4);
-          pdf.text(right, 108, y + 4);
-          y += height;
-        };
+        const approved = o.total !== null && o.total !== undefined && o.total !== "";
+        const documentType = approved
+          ? Number(o.pagado) > 0
+            ? "Comprobante de pago"
+            : "Presupuesto de reparación"
+          : "Presupuesto pendiente";
 
-        section("ORDEN Y CLIENTE");
-        pair("Orden N.º", o.numero, "Fecha de ingreso", date(o.fechaIngreso));
-        pair(
-          "Estado",
-          names[o.estado] || o.estado,
-          "Cliente",
-          [customer.nombre, customer.apellido].filter(Boolean).join(" "),
-        );
-        pair("DNI", customer.dni, "Teléfono", customer.telefono);
-        divider();
+        JmFixPdf.create(pdf, {
+          logo: await getPdfLogo(),
+          documentType,
+          order: {
+            numero: o.numero,
+            date: date(o.fechaIngreso),
+            status: names[o.estado] || o.estado,
+          },
+          customer,
+          device,
+          diagnosis: o.detalleDiagnostico || "",
+          warranty: o.garantia || "60 días",
+          includeCustomer: true,
+          includeFinancial: true,
+          financial: {
+            total: o.total,
+            paid: o.pagado,
+          },
+        });
 
-        section("DATOS DEL EQUIPO");
-        const device = deviceDetails(o);
-        pair("Tipo de equipo", device.type, "Modelo", device.model);
-        pair("Color", device.color, "Accesorios", device.accessories);
-        divider();
-
-        section("DIAGNÓSTICO Y TRABAJO A REALIZAR");
-        pdf.setFont("helvetica", "normal");
-        pdf.setFontSize(10);
-        const detail = pdf.splitTextToSize(
-          o.detalleDiagnostico || "Todavía no cargamos el diagnóstico.",
-          180,
-        );
-        ensureSpace(detail.length * 5 + 5);
-        pdf.text(detail, 15, y);
-        y += detail.length * 5 + 6;
-        if (o.presupuesto != null) line("Presupuesto:", money(o.presupuesto));
-        divider();
-
-        section("RESUMEN ECONÓMICO Y GARANTÍA");
-        pair("Garantía aplicada", o.garantia || "60 días", "Total presupuestado", o.total == null ? "—" : money(o.total));
-        pair("Total abonado", money(o.pagado), "Total restante", saldo > 0 ? money(saldo) : "—");
-        ensureSpace(10);
-        pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(11);
-        pdf.setTextColor(
-          saldo > 0 ? 200 : 20,
-          saldo > 0 ? 100 : 130,
-          saldo > 0 ? 20 : 90,
-        );
-        pdf.text(
-          "Saldo pendiente: " +
-            (saldo > 0 ? money(saldo) : "Sin saldo pendiente"),
-          15,
-          y,
-        );
-        y += 11;
-        divider();
-
-        section("CONDICIONES DE GARANTÍA");
-        const conditions = [
-          "Todas las reparaciones cuentan con 60 días de garantía, salvo que se indique expresamente lo contrario.",
-          "La garantía cubre la reparación realizada y la falla asociada al trabajo efectuado.",
-          "La garantía no cubre nuevas fallas o daños distintos a los reparados.",
-          "Los equipos mojados o con daño por líquidos quedan exceptuados de la garantía.",
-          "La garantía queda sujeta a la evaluación del equipo para determinar si el inconveniente corresponde a la reparación realizada.",
-          "La garantía no implica cobertura sobre daños ocasionados posteriormente por el uso, golpes, líquidos u otras causas ajenas a la reparación.",
-        ];
-        pdf.setFont("helvetica", "normal");
-        pdf.setFontSize(7);
-        for (let index = 0; index < conditions.length; index += 2) {
-          const left = pdf.splitTextToSize("• " + conditions[index], 84);
-          const right = pdf.splitTextToSize("• " + (conditions[index + 1] || ""), 84);
-          const height = Math.max(left.length, right.length) * 3.5 + 3;
-          ensureSpace(height);
-          pdf.text(left, 15, y);
-          pdf.text(right, 108, y);
-          y += height;
-        }
-        ensureSpace(12);
-        pdf.setDrawColor(200);
-        pdf.line(15, y, 195, y);
-        y += 8;
-        pdf.setFont("helvetica", "normal");
-        pdf.setFontSize(9);
-        pdf.setTextColor(120);
-        pdf.text("Contactanos por WhatsApp: +54 9 11 2337-6532", 15, y);
         pdf.save("Orden-" + o.numero + ".pdf");
       }
       async function data() {
