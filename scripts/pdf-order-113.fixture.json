@@ -1,0 +1,13 @@
+{
+  "numero": 113,
+  "fechaIngreso": "2026-10-10",
+  "estado": "presupuestado",
+  "tipoEquipo": "Notebook",
+  "modeloEquipo": "Sony Vaio",
+  "colorEquipo": "Negro",
+  "accesorios": "Cargador",
+  "garantia": "60 días",
+  "total": null,
+  "pagado": 0,
+  "detalleDiagnostico": "## Diagnóstico\n\n**Mantenimiento completo:** $50.000\n\n### Alternativas de memoria\n\n- **Alternativa A:** ampliación a 6 GB — $34.799 adicionales — total $84.799.\n- **Alternativa B:** ampliación a 8 GB — $69.598 adicionales — total $119.598.\n\n### Opcional independiente\n\n- **Batería:** reemplazo opcional — $155.000 adicionales.\n\nLas alternativas A y B son excluyentes. La batería es independiente y opcional."
+}
