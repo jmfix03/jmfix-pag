@@ -15,6 +15,7 @@
       rel="stylesheet"
     />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="assets/pdf-layout.js"></script>
     <style>
       :root {
         --bg: #14171c;
@@ -673,140 +674,27 @@
       async function generatePdf(o, opts) {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        const estado = ESTADOS[o.estado] || { label: o.estado || "—" };
-        doc.setFillColor(0, 191, 99);
-        doc.rect(0, 0, 210, 32, "F");
-        doc.setFillColor(74, 161, 37);
-        doc.triangle(95, 0, 210, 0, 210, 32, "F");
-        try {
-          doc.addImage(await getPdfLogo(), "JPEG", 14, 5, 22, 22);
-        } catch (e) {}
-        doc.setTextColor(255, 255, 255);
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(20);
-        doc.text("JM FIX", 42, 17);
-        doc.setTextColor(245, 255, 247);
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(10);
-        doc.text("Comprobante de reparación", 42, 24);
-
-        doc.setTextColor(20, 23, 28);
-        let y = 44;
-        const ensureSpace = (height) => {
-          if (y + height <= 280) return;
-          doc.addPage();
-          y = 20;
-        };
-        const section = (title) => {
-          ensureSpace(12);
-          doc.setFont("helvetica", "bold");
-          doc.setFontSize(11);
-          doc.setTextColor(0, 125, 71);
-          doc.text(title, 15, y);
-          doc.setTextColor(20, 23, 28);
-          y += 7;
-        };
-        const divider = () => {
-          ensureSpace(10);
-          doc.setDrawColor(210);
-          doc.line(15, y, 195, y);
-          y += 8;
-        };
-        const line = (label, value) => {
-          const values = doc.splitTextToSize(
-            String(value != null && value !== "" ? value : "—"),
-            120,
-          );
-          ensureSpace(Math.max(9, values.length * 5 + 4));
-          doc.setFont("helvetica", "bold");
-          doc.setFontSize(10);
-          doc.text(label, 15, y);
-          doc.setFont("helvetica", "normal");
-          doc.text(values, 70, y);
-          y += Math.max(9, values.length * 5 + 4);
-        };
-        const pair = (leftLabel, leftValue, rightLabel, rightValue) => {
-          const left = doc.splitTextToSize(
-            String(leftValue != null && leftValue !== "" ? leftValue : "—"),
-            54,
-          );
-          const right = doc.splitTextToSize(
-            String(rightValue != null && rightValue !== "" ? rightValue : "—"),
-            54,
-          );
-          const height = Math.max(left.length, right.length) * 4 + 7;
-          ensureSpace(height);
-          doc.setFont("helvetica", "bold");
-          doc.setFontSize(8);
-          doc.text(leftLabel, 15, y);
-          doc.text(rightLabel, 108, y);
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(9);
-          doc.text(left, 15, y + 4);
-          doc.text(right, 108, y + 4);
-          y += height;
-        };
-
-        section("ORDEN Y CLIENTE");
-        pair("Orden N.º", o.numero, "Fecha de ingreso", fmtDate(o.fechaIngreso));
-        pair("Estado", estado.label, "Garantía", o.garantia || "60 días");
-        divider();
-
-        section("DATOS DEL EQUIPO");
-        pair("Tipo de equipo", o.tipoEquipo, "Modelo", o.modeloEquipo);
-        pair("Color", o.colorEquipo, "", "");
-        divider();
-
-        section("DIAGNÓSTICO Y TRABAJO A REALIZAR");
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(10);
-        const diag = doc.splitTextToSize(
-          o.detalleDiagnostico || "Sin diagnóstico cargado.",
-          180,
-        );
-        ensureSpace(diag.length * 5 + 5);
-        doc.text(diag, 15, y);
-        y += diag.length * 5 + 6;
-        divider();
-
-        section("GARANTÍA");
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(10);
-        doc.text(o.garantia || "60 días", 15, y);
-        y += 11;
-        divider();
-
-        section("CONDICIONES DE GARANTÍA");
-        const conditions = [
-          "Todas las reparaciones cuentan con 60 días de garantía, salvo que se indique expresamente lo contrario.",
-          "La garantía cubre la reparación realizada y la falla asociada al trabajo efectuado.",
-          "La garantía no cubre nuevas fallas o daños distintos a los reparados.",
-          "Los equipos mojados o con daño por líquidos quedan exceptuados de la garantía.",
-          "La garantía queda sujeta a la evaluación del equipo para determinar si el inconveniente corresponde a la reparación realizada.",
-          "La garantía no implica cobertura sobre daños ocasionados posteriormente por el uso, golpes, líquidos u otras causas ajenas a la reparación.",
-        ];
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(7);
-        for (let index = 0; index < conditions.length; index += 2) {
-          const left = doc.splitTextToSize("• " + conditions[index], 84);
-          const right = doc.splitTextToSize("• " + (conditions[index + 1] || ""), 84);
-          const height = Math.max(left.length, right.length) * 3.5 + 3;
-          ensureSpace(height);
-          doc.text(left, 15, y);
-          doc.text(right, 108, y);
-          y += height;
-        }
-        ensureSpace(12);
-        doc.setDrawColor(200);
-        doc.line(15, y, 195, y);
-        y += 8;
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(9);
-        doc.setTextColor(120);
-        doc.text("Contactanos por WhatsApp: +54 9 11 2337-6532", 15, y);
-
+        JmFixPdf.create(doc, {
+          logo: await getPdfLogo(),
+          documentType: "Detalle de reparación",
+          order: {
+            numero: o.numero,
+            date: fmtDate(o.fechaIngreso),
+            status: (ESTADOS[o.estado] || { label: o.estado || "—" }).label,
+          },
+          device: {
+            type: o.tipoEquipo,
+            model: o.modeloEquipo,
+            color: o.colorEquipo,
+            accessories: o.accesorios,
+          },
+          diagnosis: o.detalleDiagnostico || "",
+          warranty: o.garantia || "60 días",
+          includeCustomer: false,
+          includeFinancial: false,
+        });
         if (opts && opts.autoDownload) {
-          doc.save(`Orden-${o.numero}.pdf`);
+          doc.save("Orden-" + o.numero + ".pdf");
         }
         return doc;
       }
